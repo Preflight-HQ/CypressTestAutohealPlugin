@@ -7,11 +7,15 @@ const ApiUrl = 'https://localhost:44365/v1/';
 if(!Cypress.Preflight){
   Cypress.Preflight = {};
 }
-Cypress.Preflight.autohealApiKey = null;
+Cypress.Preflight.autohealApiToken = null;
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
   if(!Cypress.Preflight){
     Cypress.Preflight = {};
+  }
+
+  if(!Cypress.Preflight.autohealApiToken){
+    Cypress.Preflight.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
   }
   Cypress.Preflight.apiUrl = ApiUrl;
   Cypress.Preflight.currentTestId = autohealTestDataId;
@@ -67,7 +71,7 @@ function log(name, message, el = null, options = null) {
   Cypress.log({name, message, $el:el });
 }
 
-Cypress.Commands.add('reportForTest', () => {
+Cypress.Commands.add('autohealReport', () => {
   let reportData = Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId];
   if(!reportData || reportData.length <= 0){
     return;

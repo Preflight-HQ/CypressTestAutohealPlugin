@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "cypress run",
-    "cy:open": "cypress open",
+    "cy:open": "set PREFLIGHT_AUTOHEAL_API_TOKEN=sdfsdfsdfs && cypress open",
     "semantic-release": "semantic-release"
   },
   "keywords": [],

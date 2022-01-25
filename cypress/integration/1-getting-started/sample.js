@@ -1,5 +1,3 @@
-Cypress.Preflight.autohealApiKey = 'e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ==';
-
 describe('test', () => {
   it('Login | YourWebApp', () => {
     cy.viewport(1440, 900);
@@ -14,8 +12,7 @@ describe('test', () => {
     cy.get('button.max-w-xs > span.hidden', '8').click();
     cy.get('button[role="menuitem"]', '9').click();
     cy.get('div.text-sm > a', '12').should('include.text', 'Forgot your password?');
-
-    cy.reportForTest();
+    cy.autohealReport();
   })
 })
 

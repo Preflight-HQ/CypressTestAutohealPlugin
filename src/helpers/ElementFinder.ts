@@ -62,7 +62,7 @@ export default class ElementFinder {
     let requestService = new BaseRequestService(this.Cypress.Preflight.apiUrl);
     let requestData = {
       testName: this.Cypress.mocha.getRunner().suite.ctx.test.title,
-      base64AuthKey: this.Cypress.Preflight.autohealApiKey
+      base64AuthKey: this.Cypress.Preflight.autohealApiToken
     }
 
     let currentTestData = this.Cypress.Preflight.tests[testId];
