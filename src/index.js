@@ -1,5 +1,5 @@
 import ElementFinder from './helpers/ElementFinder';
-import {sleepAsync} from './helpers/globalHelpers';
+import {first, sleepAsync} from './helpers/globalHelpers';
 
 const ApiUrl = 'https://localhost:44365/v1/';
 
@@ -31,11 +31,11 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
     const elNotFoundReject = (e) => reject('Element not found');
 
     await sleepAsync(500);
-
     if(await elFinder.isElOnPage(selector)){
       if(isSelXpath){
-        log('get (xPath)', selector);
-        resolve(elFinder.getElementsByXPath(selector));
+        let elements = elFinder.getElementsByXPath(selector);
+        log('get-xPath', selector, first(elements), options);
+        resolve(elements);
       } else {
         resolve(originalFn(selector, options));
       }
@@ -48,27 +48,37 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
     }
 
     // handle autoheal
-    log('log',`Element not found with existing selector "${selector}". Trying to apply test autoheal data.`)
+    log('log',`Element not found with existing selector "${selector}". Trying to apply test autoheal data.`, null, options)
     let searchResult = await elFinder.findElementByAutohealData(Cypress.Preflight.currentTestId, actionId, doc);
     if(!searchResult){
       elNotFoundReject();
       return;
     }
-    log('get (Autoheal)', searchResult.selector);
+    log('get-autoheal', searchResult.selector, searchResult.element, options);
     pushReportData(selector, actionId, searchResult);
     resolve(searchResult.element);
   });
 })
+
+function log(name, message, el = null, options = null) {
+  if(options && !options.log === false){
+    return;
+  }
+  Cypress.log({name, message, $el:el });
+}
 
 Cypress.Commands.add('reportForTest', () => {
   let reportData = Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId];
   if(!reportData || reportData.length <= 0){
     return;
   }
-  let report = reportData.map(t => {
-    return `Action (${t.actionId}) replace selector '${t.originalSelector}' with '${t.newSelector}'\n`;
+  let position = 1;
+  reportData.forEach(t => {
+    let out = `${position}. Action (${t.actionId}) replace selector '${t.originalSelector}' with '${t.newSelector}'\n`;
+    position++;
+    log('update request', out)
   });
-  log('report', report)
+
 });
 
 function pushReportData(selector, actionId, searchResult){
@@ -79,13 +89,6 @@ function pushReportData(selector, actionId, searchResult){
     actionId,
     originalSelector: selector,
     newSelector: searchResult.selector
-  });
-}
-
-function log(name, message){
-  Cypress.log({
-    name,
-    message
   });
 }
 

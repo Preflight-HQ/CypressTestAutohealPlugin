@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "outDir": "./dist",
     "experimentalDecorators": true,
     "module": "es6",
-    "moduleResolution": "node",
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": true,
@@ -11,10 +12,7 @@
       "dom"
     ]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ],
+  "include": ["src"],
   "exclude": [
     "node_modules"
   ]
