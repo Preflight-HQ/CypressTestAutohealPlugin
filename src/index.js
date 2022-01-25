@@ -32,7 +32,7 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
     let elFinder = new ElementFinder(cy.state('window').document, Cypress)
     let doc = cy.state('window').document;
     let isSelXpath = elFinder.isXpathSelector(selector);
-    const elNotFoundReject = (e) => reject('Element not found');
+    const elNotFoundReject = (m) => reject('Element not found.' + m);
 
     await sleepAsync(500);
     if(await elFinder.isElOnPage(selector)){
@@ -55,7 +55,7 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
     log('log',`Element not found with existing selector "${selector}". Trying to apply test autoheal data.`, null, options)
     let searchResult = await elFinder.findElementByAutohealData(Cypress.Preflight.currentTestId, actionId, doc);
     if(!searchResult){
-      elNotFoundReject();
+      elNotFoundReject(' ' + elFinder.lastError);
       return;
     }
     log('get-autoheal', searchResult.selector, searchResult.element, options);

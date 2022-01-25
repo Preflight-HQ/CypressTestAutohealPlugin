@@ -5,6 +5,7 @@ import ElementSelectorsSearch from "../ElementSelectorsSearch";
 export default class ElementFinder {
   private doc: Document;
   private Cypress: any;
+  public lastError:string;
 
   constructor(document: Document, cypress: any){
     this.doc = document;
@@ -79,6 +80,7 @@ export default class ElementFinder {
       this.Cypress.Preflight.tests[testId] = testAutohealData;
       return testAutohealData;
     } catch (e) {
+      this.lastError = 'Autoheal request failed: ' + e.responseText
       return null;
     }
   }
