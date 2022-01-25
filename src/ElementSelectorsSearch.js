@@ -1,4 +1,4 @@
-export default class ElementFinder {
+export default class ElementSelectorsSearch {
   quickSearchBestResults = [];
   expectedText = [];
   cssSelectors = [];

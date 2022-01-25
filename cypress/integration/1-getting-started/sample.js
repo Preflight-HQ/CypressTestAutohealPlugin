@@ -14,6 +14,8 @@ describe('test', () => {
     cy.get('button.max-w-xs > span.hidden', '8').click();
     cy.get('button[role="menuitem"]', '9').click();
     cy.get('div.text-sm > a', '12').should('include.text', 'Forgot your password?');
+
+    cy.reportForTest();
   })
 })
 
