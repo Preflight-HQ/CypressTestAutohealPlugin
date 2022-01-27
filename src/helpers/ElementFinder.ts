@@ -1,11 +1,12 @@
 import {first, sleepAsync} from "./globalHelpers";
 import BaseRequestService from "../BaseRequestService";
 import ElementSelectorsSearch from "../ElementSelectorsSearch";
+import PreflightGlobalSettings from "../PreflightGlobalSettings";
 
 export default class ElementFinder {
   private doc: Document;
   private Cypress: any;
-  public lastError:string;
+  public lastError:string = null;
 
   constructor(document: Document, cypress: any){
     this.doc = document;
@@ -60,13 +61,13 @@ export default class ElementFinder {
   }
 
   public async getTestAutohealData(testId: string): Promise<any | null> {
-    let requestService = new BaseRequestService(this.Cypress.Preflight.apiUrl);
+    let requestService = new BaseRequestService(PreflightGlobalSettings.apiUrl);
     let requestData = {
       testName: this.Cypress.mocha.getRunner().suite.ctx.test.title,
-      base64AuthKey: this.Cypress.Preflight.autohealApiToken
+      base64AuthKey: PreflightGlobalSettings.autohealApiToken
     }
 
-    let currentTestData = this.Cypress.Preflight.tests[testId];
+    let currentTestData = PreflightGlobalSettings.tests[testId];
     if(currentTestData) {
       return currentTestData;
     }
@@ -77,7 +78,7 @@ export default class ElementFinder {
       }
       let autohealResponse = JSON.parse(autohealResponseJson);
       let testAutohealData = JSON.parse(autohealResponse.dataJson);
-      this.Cypress.Preflight.tests[testId] = testAutohealData;
+      PreflightGlobalSettings.tests[testId] = testAutohealData;
       return testAutohealData;
     } catch (e) {
       this.lastError = 'Autoheal request failed: ' + e.responseText

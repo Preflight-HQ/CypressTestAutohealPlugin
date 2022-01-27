@@ -1,40 +1,28 @@
 import ElementFinder from './helpers/ElementFinder';
 import {first, sleepAsync} from './helpers/globalHelpers';
-
-const ApiUrl = 'https://localhost:44365/v1/';
-
-
-if(!Cypress.Preflight){
-  Cypress.Preflight = {};
-}
-Cypress.Preflight.autohealApiToken = null;
+import PreflightGlobalSettings from './PreflightGlobalSettings';
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
-  if(!Cypress.Preflight){
-    Cypress.Preflight = {};
-  }
 
-  if(!Cypress.Preflight.autohealApiToken){
-    Cypress.Preflight.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
+  if(!PreflightGlobalSettings.autohealApiToken){
+    PreflightGlobalSettings.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || Cypress.PreflightAutohealApiToken || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
   }
-  Cypress.Preflight.apiUrl = ApiUrl;
-  Cypress.Preflight.currentTestId = autohealTestDataId;
-  Cypress.Preflight.tests = [];
-  Cypress.Preflight.testsReports = [];
+  PreflightGlobalSettings.currentTestId = autohealTestDataId;
 });
 
 
 Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, possibleActionId = null) => {
-  let actionId = typeof optionsOrActionId === 'string' ? optionsOrActionId :  possibleActionId;
-  let options = typeof optionsOrActionId === 'string' ? {} :  optionsOrActionId;
+  let isOptionsActionId = typeof optionsOrActionId === 'number' || typeof optionsOrActionId === 'string';
+  let actionId = isOptionsActionId ? optionsOrActionId :  possibleActionId;
+  let options = isOptionsActionId ? {} :  optionsOrActionId;
 
   return new Cypress.Promise(async (resolve, reject) => {
     let elFinder = new ElementFinder(cy.state('window').document, Cypress)
     let doc = cy.state('window').document;
     let isSelXpath = elFinder.isXpathSelector(selector);
-    const elNotFoundReject = (m) => reject('Element not found.' + m);
+    const elNotFoundReject = (m) => reject('Element not found.' + ((!m || m.trim() == 'undefined') ? '' : ' '+m));
 
-    await sleepAsync(500);
+    await sleepAsync(100);
     if(await elFinder.isElOnPage(selector)){
       if(isSelXpath){
         let elements = elFinder.getElementsByXPath(selector);
@@ -46,16 +34,16 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
       return;
     }
 
-    if(!actionId || !Cypress.Preflight.currentTestId){
+    if(!actionId || !PreflightGlobalSettings.currentTestId){
       elNotFoundReject();
       return;
     }
 
     // handle autoheal
     log('log',`Element not found with existing selector "${selector}". Trying to apply test autoheal data.`, null, options)
-    let searchResult = await elFinder.findElementByAutohealData(Cypress.Preflight.currentTestId, actionId, doc);
+    let searchResult = await elFinder.findElementByAutohealData(PreflightGlobalSettings.currentTestId, actionId, doc);
     if(!searchResult){
-      elNotFoundReject(' ' + elFinder.lastError);
+      elNotFoundReject(elFinder.lastError);
       return;
     }
     log('get-autoheal', searchResult.selector, searchResult.element, options);
@@ -72,7 +60,7 @@ function log(name, message, el = null, options = null) {
 }
 
 Cypress.Commands.add('autohealReport', () => {
-  let reportData = Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId];
+  let reportData = PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId];
   if(!reportData || reportData.length <= 0){
     return;
   }
@@ -86,10 +74,10 @@ Cypress.Commands.add('autohealReport', () => {
 });
 
 function pushReportData(selector, actionId, searchResult){
-  if(!Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId]){
-    Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId] = [];
+  if(!PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId]){
+    PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId] = [];
   }
-  Cypress.Preflight.testsReports[Cypress.Preflight.currentTestId].push({
+  PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId].push({
     actionId,
     originalSelector: selector,
     newSelector: searchResult.selector
