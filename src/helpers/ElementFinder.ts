@@ -1,5 +1,6 @@
 import {first, sleepAsync} from "./globalHelpers";
 import BaseRequestService from "../BaseRequestService";
+import ContextParserSearch from "../ContextParserSearch";
 import ElementSelectorsSearch from "../ElementSelectorsSearch";
 import PreflightGlobalSettings from "../PreflightGlobalSettings";
 
@@ -26,6 +27,10 @@ export default class ElementFinder {
 
   public getElements(selector: string): Element[]{
     return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(this.doc.querySelectorAll(selector));
+  }
+
+  public getFirstElement(selector: string): Element{
+    return first(this.getElements(selector));
   }
 
   private findFirstVisibleParent(element: Element, limit: number = 5){
@@ -102,10 +107,23 @@ export default class ElementFinder {
     }
     let bestResultSelector = bestResult.selector;
     let visibleElement = this.getVisibleElement(this.getElements(bestResultSelector), 3)
+    let parserElementSimplePath = await this.getElSimplePath(actionAutohealData);
     return {
+      elementSimplePath: parserElementSimplePath,
       selector: bestResultSelector,
       element:  visibleElement
     }
+  }
+
+  private async getElSimplePath(actionAutohealData: any[]) {
+    let parserDataUrl = actionAutohealData.find(ads => ads.type == 'contextparserdata')?.value;
+    if(!parserDataUrl){
+      return null;
+    }
+    let parserSearch = new ContextParserSearch(this.doc);
+    let simplePath = await parserSearch.getSimplePathFromActionData(parserDataUrl);
+    return parserSearch.getSimpleMessage(simplePath);
+
   }
 
   public getVisibleElement(elements:Element[], findParentLimit:number = 5) {

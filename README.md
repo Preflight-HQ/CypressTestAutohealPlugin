@@ -14,7 +14,7 @@ require('preflight-test-autoheal')
 ## Create account on https://app.preflight.com/
  - Create API key
 ## Set API key in your test envorinment
-- you can set key in code like  `Cypress.Preflight.autohealApiToken = [YOUR_KEY];`
+- you can set key in code like  `Cypress.PreflightAutohealApiToken = [YOUR_KEY];`
 - or set it in Cypress env 
 
 ```

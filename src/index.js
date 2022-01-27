@@ -1,6 +1,7 @@
 import ElementFinder from './helpers/ElementFinder';
 import {first, sleepAsync} from './helpers/globalHelpers';
 import PreflightGlobalSettings from './PreflightGlobalSettings';
+import {dragAndDrop} from './helpers/commandHelpers';
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 
@@ -46,7 +47,7 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
       elNotFoundReject(elFinder.lastError);
       return;
     }
-    log('get-autoheal', searchResult.selector, searchResult.element, options);
+    log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, options);
     pushReportData(selector, actionId, searchResult);
     resolve(searchResult.element);
   });
@@ -69,6 +70,29 @@ Cypress.Commands.add('autohealReport', () => {
     let out = `${position}. Action (${t.actionId}) replace selector '${t.originalSelector}' with '${t.newSelector}'\n`;
     position++;
     log('update request', out)
+  });
+
+});
+
+Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
+  return new Cypress.Promise(async (resolve, reject) => {
+    let elFinder = new ElementFinder(cy.state('window').document, Cypress);
+    await sleepAsync(100);
+    if(!await elFinder.isElOnPage(dragSelector)){
+      reject('Drag element not found');
+      return;
+    }
+    if(!await elFinder.isElOnPage(dropSelector)){
+      reject('Drop element not found');
+      return;
+    }
+    let dragEl = elFinder.getFirstElement(dragSelector);
+    let dropEl = elFinder.getFirstElement(dropSelector);
+    let doc = cy.state('window').document;
+    debugger
+    dragAndDrop(dragEl, dropEl, doc);
+    log('drag&drop', `${dragSelector} => ${dropSelector}`, dragEl)
+    resolve()
   });
 
 });
