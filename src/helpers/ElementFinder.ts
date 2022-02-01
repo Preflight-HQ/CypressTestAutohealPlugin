@@ -1,23 +1,24 @@
 import {first, sleepAsync} from "./globalHelpers";
-import BaseRequestService from "../BaseRequestService";
+import preflightBaseApiService from "../APIs/preflightBaseApiService";
 import ContextParserSearch from "../ContextParserSearch";
 import ElementSelectorsSearch from "../ElementSelectorsSearch";
-import PreflightGlobalSettings from "../PreflightGlobalSettings";
+import PreflightGlobalStore from "../PreflightGlobalStore";
 
 export default class ElementFinder {
   private doc: Document;
-  private Cypress: any;
   public lastError:string = null;
+  public parentIframeSelector:string = null;
 
-  constructor(document: Document, cypress: any){
+  constructor(document: Document, parentIframeSelector: string){
     this.doc = document;
-    this.Cypress = cypress;
+    this.parentIframeSelector = parentIframeSelector;
   }
 
   public getElementsByXPath(xpath: string) : Element[]
   {
+    let parent = this.parentIframeSelector ? this.doc.querySelector(this.parentIframeSelector) : this.doc;
     let results = [];
-    let query = document.evaluate(xpath, this.doc,
+    let query = document.evaluate(xpath, parent,
       null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0, length = query.snapshotLength; i < length; ++i) {
       results.push(query.snapshotItem(i));
@@ -25,12 +26,18 @@ export default class ElementFinder {
     return results;
   }
 
-  public getElements(selector: string): Element[]{
-    return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(this.doc.querySelectorAll(selector));
+  public getElements(selector: string, parentSelector: string|null = this.parentIframeSelector): Element[]{
+    let parent = this.doc;
+    if (parentSelector){
+      // @ts-ignore
+      let iframeDoc = this.getFirstElement(parentSelector, null)?.contentDocument;
+      parent = iframeDoc || this.doc;
+    }
+    return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(parent.querySelectorAll(selector));
   }
 
-  public getFirstElement(selector: string): Element{
-    return first(this.getElements(selector));
+  public getFirstElement(selector: string, parentSelector: string|null = this.parentIframeSelector): Element{
+    return first(this.getElements(selector, parentSelector));
   }
 
   private findFirstVisibleParent(element: Element, limit: number = 5){
@@ -65,25 +72,24 @@ export default class ElementFinder {
     return result;
   }
 
-  public async getTestAutohealData(testId: string): Promise<any | null> {
-    let requestService = new BaseRequestService(PreflightGlobalSettings.apiUrl);
+  public async getTestAutohealData(testId: string, testTitle:string): Promise<any | null> {
     let requestData = {
-      testName: this.Cypress.mocha.getRunner().suite.ctx.test.title,
-      base64AuthKey: PreflightGlobalSettings.autohealApiToken
+      testName: testTitle,
+      base64AuthKey: PreflightGlobalStore.autohealApiToken
     }
 
-    let currentTestData = PreflightGlobalSettings.tests[testId];
+    let currentTestData = PreflightGlobalStore.state.currentTestData;
     if(currentTestData) {
       return currentTestData;
     }
     try {
-      let autohealResponseJson = await requestService.post('Autoheal/TestData/' + testId, requestData);
+      let autohealResponseJson = await preflightBaseApiService.post('Autoheal/TestData/' + testId, requestData);
       if(!autohealResponseJson){
         return null;
       }
       let autohealResponse = JSON.parse(autohealResponseJson);
       let testAutohealData = JSON.parse(autohealResponse.dataJson);
-      PreflightGlobalSettings.tests[testId] = testAutohealData;
+      PreflightGlobalStore.state.currentTestData = testAutohealData;
       return testAutohealData;
     } catch (e) {
       this.lastError = 'Autoheal request failed: ' + e.responseText
@@ -91,8 +97,8 @@ export default class ElementFinder {
     }
   }
 
-  public async findElementByAutohealData(testId: string, actionId: string) {
-    let testAutohealData = await this.getTestAutohealData(testId);
+  public async findElementByAutohealData(testId: string, actionId: string, testTitle: string) {
+    let testAutohealData = await this.getTestAutohealData(testId, testTitle);
     let actionAutohealData = testAutohealData?.actions.find(a => a.guid == actionId)?.data;
     if(!testAutohealData){
       return actionAutohealData;

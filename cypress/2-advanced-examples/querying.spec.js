@@ -68,7 +68,7 @@ context('Querying', () => {
   it('.within() - query DOM elements within a specific element', () => {
     // https://on.cypress.io/within
     cy.get('.query-form').within(() => {
-      cy.get('input:first').should('have.attr', 'placeholder', 'Email')
+      cy.get('input:first').should('have.attr', 'placeholder', 'EmailPreview')
       cy.get('input:last').should('have.attr', 'placeholder', 'Password')
     })
   })

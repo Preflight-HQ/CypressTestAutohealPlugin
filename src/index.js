@@ -1,55 +1,53 @@
 import ElementFinder from './helpers/ElementFinder';
 import {first, sleepAsync} from './helpers/globalHelpers';
-import PreflightGlobalSettings from './PreflightGlobalSettings';
+import PreflightGlobalStore from './PreflightGlobalStore';
 import {dragAndDrop} from './helpers/commandHelpers';
+import OpenEmailCommand from './commands/OpenEmailCommand';
+import CloseEmailCommand from './commands/CloseEmailCommand';
+import loggerService from './helpers/loggerService';
+import GetElementCommand from './commands/GetElementCommand';
+import variablesProcessor from './helpers/variablesProcessor';
+
+beforeEach(function() {
+  PreflightGlobalStore.initialize();
+});
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 
-  if(!PreflightGlobalSettings.autohealApiToken){
-    PreflightGlobalSettings.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || Cypress.PreflightAutohealApiToken || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
+  if(!PreflightGlobalStore.autohealApiToken){
+    PreflightGlobalStore.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || Cypress.PreflightAutohealApiToken || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
   }
-  PreflightGlobalSettings.currentTestId = autohealTestDataId;
+  PreflightGlobalStore.state.currentTestId = autohealTestDataId;
 });
 
+Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
+  if(value == '{{generate.email}}'){
+    value = variablesProcessor.generatedEmail;
+  }
+  return originalFn(element, value, options);
+})
 
 Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, possibleActionId = null) => {
   let isOptionsActionId = typeof optionsOrActionId === 'number' || typeof optionsOrActionId === 'string';
   let actionId = isOptionsActionId ? optionsOrActionId :  possibleActionId;
-  let options = isOptionsActionId ? {} :  optionsOrActionId;
+  let getOptions = isOptionsActionId ? {} :  optionsOrActionId;
+
+
 
   return new Cypress.Promise(async (resolve, reject) => {
-    let elFinder = new ElementFinder(cy.state('window').document, Cypress)
     let doc = cy.state('window').document;
-    let isSelXpath = elFinder.isXpathSelector(selector);
-    const elNotFoundReject = (m) => reject('Element not found.' + ((!m || m.trim() == 'undefined') ? '' : ' '+m));
-
+    let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
     await sleepAsync(100);
-    if(await elFinder.isElOnPage(selector)){
-      if(isSelXpath){
-        let elements = elFinder.getElementsByXPath(selector);
-        log('get-xPath', selector, first(elements), options);
-        resolve(elements);
-      } else {
-        resolve(originalFn(selector, options));
+    try {
+      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle);
+      if(await getCommand.canBeHandledWithOriginalGet()) {
+        return resolve(originalFn(selector, getOptions));
       }
+      resolve(await getCommand.process());
+    } catch (e) {
+      reject(e.message);
       return;
     }
-
-    if(!actionId || !PreflightGlobalSettings.currentTestId){
-      elNotFoundReject();
-      return;
-    }
-
-    // handle autoheal
-    log('log',`Element not found with existing selector "${selector}". Trying to apply test autoheal data.`, null, options)
-    let searchResult = await elFinder.findElementByAutohealData(PreflightGlobalSettings.currentTestId, actionId, doc);
-    if(!searchResult){
-      elNotFoundReject(elFinder.lastError);
-      return;
-    }
-    log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, options);
-    pushReportData(selector, actionId, searchResult);
-    resolve(searchResult.element);
   });
 })
 
@@ -61,7 +59,7 @@ function log(name, message, el = null, options = null) {
 }
 
 Cypress.Commands.add('autohealReport', () => {
-  let reportData = PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId];
+  let reportData = PreflightGlobalStore.state.testReport;
   if(!reportData || reportData.length <= 0){
     return;
   }
@@ -72,6 +70,32 @@ Cypress.Commands.add('autohealReport', () => {
     log('update request', out)
   });
 
+});
+
+Cypress.Commands.add('openEmail', (subject, timeout = 30000) => {
+  let openEmailCommand = new OpenEmailCommand(cy.state('window').document);
+  return new Cypress.Promise(async (resolve, reject) => {
+    try {
+      await openEmailCommand.process(subject, timeout);
+    } catch (e) {
+      reject(e.message);
+      return;
+    }
+    resolve();
+  });
+});
+
+Cypress.Commands.add('closeEmail', () => {
+  let closeEmailCommand = new CloseEmailCommand(cy.state('window').document);
+  return new Cypress.Promise(async (resolve, reject) => {
+    try {
+      await closeEmailCommand.process();
+    } catch (e) {
+      reject(e.message);
+      return;
+    }
+    resolve();
+  });
 });
 
 Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
@@ -96,16 +120,9 @@ Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
   });
 
 });
+loggerService.log = log;
 
-function pushReportData(selector, actionId, searchResult){
-  if(!PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId]){
-    PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId] = [];
-  }
-  PreflightGlobalSettings.testsReports[PreflightGlobalSettings.currentTestId].push({
-    actionId,
-    originalSelector: selector,
-    newSelector: searchResult.selector
-  });
-}
+
+
 
 

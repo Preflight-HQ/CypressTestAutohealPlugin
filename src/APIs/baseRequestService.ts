@@ -5,7 +5,7 @@ export default class BaseRequestService {
     this.baseUrl = baseUrl;
   }
 
-  makeRequest(method, endpoint, data, responseType = null, contentType="application/json;charset=UTF-8"){
+  makeRequest(method, endpoint, data = null, responseType = null, contentType="application/json;charset=UTF-8") : Promise<string|null>{
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
       if(responseType){
@@ -37,7 +37,7 @@ export default class BaseRequestService {
     });
   }
 
-  post(endpoint, data){
+  post(endpoint, data) : Promise<string>{
     if (typeof data !== 'string' && !(data instanceof String)) {
       data = JSON.stringify(data);
     }
@@ -52,7 +52,7 @@ export default class BaseRequestService {
     return this.makeRequest('GET', endpoint);
   }
 
-  getBlob(endpoint){
+  public getBlob(endpoint){
     return this.makeRequest('GET', endpoint, null, 'blob');
   }
 

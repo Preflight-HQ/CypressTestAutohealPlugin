@@ -1,4 +1,4 @@
-import BaseRequestService from "./BaseRequestService";
+import preflightBaseApiService from "./APIs/preflightBaseApiService";
 import * as JSZip from "jszip";
 import {ParsedTargetTextPathGenerator} from "preflight-web-parser";
 
@@ -17,8 +17,7 @@ export default class ContextParserSearch {
     }
     try {
       if (typeof (input) === 'string' && input.startsWith('http')) {
-        let rqSvr = new BaseRequestService();
-        let fileContentResult = await rqSvr.getBlob(input);
+        let fileContentResult = await preflightBaseApiService.getBlob(input);
         let zipFile = await JSZip.loadAsync(fileContentResult);
         input = await zipFile.file('value').async('string')
       }
