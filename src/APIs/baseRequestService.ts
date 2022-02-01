@@ -5,9 +5,10 @@ export default class BaseRequestService {
     this.baseUrl = baseUrl;
   }
 
-  makeRequest(method, endpoint, data = null, responseType = null, contentType="application/json;charset=UTF-8") : Promise<string|null>{
+  makeRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8") : Promise<string|null>{
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
+      let that = this;
       if(responseType){
         xhr.responseType = responseType;
       }
@@ -19,22 +20,30 @@ export default class BaseRequestService {
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
         } else {
-          reject({
-            status: this.status,
-            statusText: xhr.statusText,
-            responseText: xhr.responseText
-          });
+
+          reject(that.buldRejectResponse(this.status, xhr));
         }
       };
       xhr.onerror = function () {
-        reject({
-          status: this.status,
-          statusText: xhr.statusText,
-          responseText: xhr.responseText
-        });
+        reject(that.buldRejectResponse(this.status, xhr));
       };
       xhr.send(data);
     });
+  }
+
+  private buldRejectResponse(status, xhr){
+    let responseText = null;
+    let statusText = null;
+    try {
+      responseText = xhr.responseText
+      statusText = xhr.statusText
+    }
+    catch (e) {}
+    return {
+      status,
+      statusText,
+      responseText
+    }
   }
 
   post(endpoint, data) : Promise<string>{
@@ -53,7 +62,7 @@ export default class BaseRequestService {
   }
 
   public getBlob(endpoint){
-    return this.makeRequest('GET', endpoint, null, 'blob');
+    return this.makeRequest('GET', endpoint, undefined, 'blob');
   }
 
 

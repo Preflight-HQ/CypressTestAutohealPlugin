@@ -115,7 +115,7 @@ export default class ElementFinder {
     let visibleElement = this.getVisibleElement(this.getElements(bestResultSelector), 3)
     let parserElementSimplePath = await this.getElSimplePath(actionAutohealData);
     return {
-      elementSimplePath: parserElementSimplePath,
+      elementSimplePath: parserElementSimplePath || bestResultSelector,
       selector: bestResultSelector,
       element:  visibleElement
     }

@@ -17,9 +17,5 @@
  */
 // eslint-disable-next-line no-unused-vars
 module.exports = (on, config) => {
-  on('before:spec', (spec) => {
-    debugger
 
-    console.log('Running', spec.relative)
-  })
 }

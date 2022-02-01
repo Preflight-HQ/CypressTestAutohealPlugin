@@ -31,14 +31,12 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
   let isOptionsActionId = typeof optionsOrActionId === 'number' || typeof optionsOrActionId === 'string';
   let actionId = isOptionsActionId ? optionsOrActionId :  possibleActionId;
   let getOptions = isOptionsActionId ? {} :  optionsOrActionId;
-
-
+  let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
+  let doc = cy.state('window').document;
 
   return new Cypress.Promise(async (resolve, reject) => {
-    let doc = cy.state('window').document;
-    let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
-    await sleepAsync(100);
     try {
+      await sleepAsync(100);
       let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle);
       if(await getCommand.canBeHandledWithOriginalGet()) {
         return resolve(originalFn(selector, getOptions));
@@ -46,7 +44,6 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
       resolve(await getCommand.process());
     } catch (e) {
       reject(e.message);
-      return;
     }
   });
 })
@@ -113,7 +110,6 @@ Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
     let dragEl = elFinder.getFirstElement(dragSelector);
     let dropEl = elFinder.getFirstElement(dropSelector);
     let doc = cy.state('window').document;
-    debugger
     dragAndDrop(dragEl, dropEl, doc);
     log('drag&drop', `${dragSelector} => ${dropSelector}`, dragEl)
     resolve()

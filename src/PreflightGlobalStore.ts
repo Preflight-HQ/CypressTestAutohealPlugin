@@ -10,7 +10,7 @@ export default class PreflightGlobalStore {
     email: null,
     currentTestId: null,
     currentTestData: null,
-    testsReport: []
+    testReport: []
   }
 
   public static initialize() {

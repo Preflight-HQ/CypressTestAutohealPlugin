@@ -1,6 +1,8 @@
 import preflightBaseApiService from "./APIs/preflightBaseApiService";
 import * as JSZip from "jszip";
 import {ParsedTargetTextPathGenerator} from "preflight-web-parser";
+import baseRequestService from "./APIs/baseRequestService";
+import BaseRequestService from "./APIs/baseRequestService";
 
 export default class ContextParserSearch {
   private document = null;
@@ -17,7 +19,8 @@ export default class ContextParserSearch {
     }
     try {
       if (typeof (input) === 'string' && input.startsWith('http')) {
-        let fileContentResult = await preflightBaseApiService.getBlob(input);
+        let requestService = new BaseRequestService();
+        let fileContentResult = await requestService.getBlob(input);
         let zipFile = await JSZip.loadAsync(fileContentResult);
         input = await zipFile.file('value').async('string')
       }
@@ -50,6 +53,9 @@ export default class ContextParserSearch {
   }
 
   getSimpleMessage(simplePath) {
+    if(!simplePath){
+      return null;
+    }
     if(!simplePath.target){
       return 'No target';
     }
