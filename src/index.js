@@ -33,11 +33,12 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
   let getOptions = isOptionsActionId ? {} :  optionsOrActionId;
   let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
   let doc = cy.state('window').document;
+  let getSelectorFn = (el) => Cypress.SelectorPlayground.getSelector(Cypress.$(el)); // TODO better selector generator
 
   return new Cypress.Promise(async (resolve, reject) => {
     try {
       await sleepAsync(100);
-      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle);
+      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle, getSelectorFn);
       if(await getCommand.canBeHandledWithOriginalGet()) {
         return resolve(originalFn(selector, getOptions));
       }

@@ -12,9 +12,10 @@ export default class GetElementCommand {
   private readonly actionId: string;
   private elSelector: ElementsSelector;
   private elFinder: ElementFinder;
+  private getSelectorFn;
   private _isElMainSelOnPage: boolean | undefined = undefined;
 
-  constructor(document: Document, selector, options, actionId, testTitle) {
+  constructor(document: Document, selector, options, actionId, testTitle, getSelectorFn) {
     this.doc = document;
     this.actionId = actionId;
     this.mainSelector = selector;
@@ -22,6 +23,7 @@ export default class GetElementCommand {
     this.testTitle = testTitle;
     this.elSelector = new ElementsSelector(this.doc, this.parentIframeSelector);
     this.elFinder = new ElementFinder(this.doc, this.parentIframeSelector);
+    this.getSelectorFn = getSelectorFn;
   }
 
   public get parentIframeSelector(): string|null {
@@ -69,7 +71,9 @@ export default class GetElementCommand {
       this.elNotFoundException(this.elFinder.lastError);
       return;
     }
-
+    if(!searchResult.selector) {
+      searchResult.selector = this.getSelectorFn(searchResult.element);
+    }
     loggerService.log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, this.options);
     reportService.pushData(this.mainSelector, this.actionId, searchResult);
     return searchResult.element as Element;
