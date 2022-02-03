@@ -15,7 +15,7 @@ export default class ElementSearchResultGrouped {
 
   public get bestSelector(): string | null {
     let selectors = this.searchResults.filter(g => g.searchMethod == ElementSearchMethod.SELECTORS && g.score > 0.7);
-    return first(selectors.sort((a, b) => a.score - b.score));
+    return first(selectors.sort((a, b) => b.score - a.score));
   }
 
   public get contextAwarenessResult(): any | null {

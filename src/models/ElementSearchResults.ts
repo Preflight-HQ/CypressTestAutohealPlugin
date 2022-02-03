@@ -18,6 +18,6 @@ export default class ElementSearchResults {
   public get bestResult(): ElementSearchResultGrouped {
     let grouped = groupBy(this.searchResults, 'element');
     let groups = Object.values(grouped).map((g: ElementSearchResult[]) => new ElementSearchResultGrouped(g));
-    return first(groups.sort((a, b) => a.score - b.score))
+    return first(groups.sort((a, b) => b.score - a.score))
   }
 }

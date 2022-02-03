@@ -1,8 +1,10 @@
 import emailApiService from '../APIs/emailApiService';
-import {sleepAsync} from "../helpers/globalHelpers";
+import {first, sleepAsync} from "../helpers/globalHelpers";
 import EmailPreview from "../models/EmialPreview";
 import loggerService from "../helpers/loggerService";
 import variablesProcessor from "../helpers/variablesProcessor";
+import {distance as levenshteinDistance} from "fastest-levenshtein";
+
 export default class OpenEmailCommand {
   private doc: Document;
   private readonly email: string;
@@ -33,8 +35,18 @@ export default class OpenEmailCommand {
     loggerService.log('openEmail', `Open email with subject "${subject}"`);
   }
 
-  private findEmailBySubject(emails: EmailPreview[], subject: string): EmailPreview{
-    return emails.find(e => e.subject == subject);
+  private findEmailBySubject(emails: EmailPreview[], subject: string): EmailPreview {
+    let scoredEmails = emails.map(e => {
+      return {
+        email: e,
+        distance: levenshteinDistance(e.subject?.toLowerCase()?.trim(), subject?.toLowerCase()?.trim())
+      }
+    });
+    let bestEmail = first(scoredEmails.sort((a, b) => b.distance - a.distance));
+    if(!bestEmail || bestEmail.distance > (bestEmail.email.subject.length / 2)){
+      return null;
+    }
+    return bestEmail.email;
   }
 
   private openEmailInIframe(emailContentHtml: string) {
