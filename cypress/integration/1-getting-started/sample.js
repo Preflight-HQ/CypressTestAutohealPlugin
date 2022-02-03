@@ -25,14 +25,14 @@ describe('test', () => {
     cy.viewport(1440, 900);
     cy.initializeAutoheal('8JAljifO2ZIg');
     cy.visit('https://yourweb.app/#/login');
-    cy.get('//sd2[text()=" Sign in to your account "]/..//a', 2).click();
-    // cy.get('//label[text()="First name"]/..//input', 3).type('test');
-    // cy.get('//label[text()="Last name"]/..//input', 4).type('test');
-    // cy.get('//label[text()="Email address"]/..//input', 5).type('{{generate.email}}');
-    // cy.get('//label[text()="Password"]/..//input', 6).type('{{generate.email}}');
-    // cy.get('div.flex-col > button[id="pf-lesson-signup-4"]', 7).click();
-    // cy.openEmail('Verify your email');
-    // cy.get('a', {iframe: 'iframe#pf-email-iframe'}, 9).click();
+    cy.get('//h3[text()=" Sign in to your account "]/..//a', 2).click();
+    cy.get('//lel[text()="First name"]/..//input', 3).type('test');
+    cy.get('//label[text()="Last name"]/..//input', 4).type('test');
+    cy.get('//label[text()="Email address"]/..//input', 5).type('{{generate.email}}');
+    cy.get('//label[text()="Password"]/..//input', 6).type('{{generate.email}}');
+    cy.get('div.flex-col > button[id="pf-lesson-signup-4"]', 7).click();
+    cy.openEmail('Verify your email');
+    cy.get('a', {iframe: 'iframe#pf-email-iframe'}, 9).click();
     // cy.closeEmail()
     // cy.get('//h3[descendant::text()=" Email verified successfully! "]', 11).should('include.text', 'Email verified successfully!');
     cy.autohealReport();

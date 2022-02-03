@@ -1,30 +1,65 @@
 import preflightBaseApiService from "./APIs/preflightBaseApiService";
 import * as JSZip from "jszip";
-import {ParsedTargetTextPathGenerator} from "preflight-web-parser";
+import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig} from "preflight-web-parser";
 import baseRequestService from "./APIs/baseRequestService";
 import BaseRequestService from "./APIs/baseRequestService";
 
-export default class ContextParserSearch {
+export default class ContextParserSearchModule {
   private document = null;
+  private webParser:WebPageParser;
+  private downloadedImputs = [];
 
-  constructor(document) {
-    this.document = document;
+  constructor(doc) {
+    this.document = doc;
+    let config = new WebPageParserConfig();
+    config.rootElement = this.document.body;
+    config.document = this.document;
+    config.parseDOMTimeout = 3000;
+    config.recycleParsedTokes = true;
+    config.parseElementsOnlyInViewport = false;
+    this.webParser = WebPageParser.BuildFromConfig(config);
   }
 
-  async getUncompressedParserData(input) {
+  async findElement(dataUrl){
+    let originalParsedData = await this.getUncompressedParserData(dataUrl);    if(!originalParsedData){
+      return null;
+    }
+    let elementFinder = new ElementFinder(originalParsedData.parsedData);
+    this.webParser.parseDOM(false);
+    let foundElementData = await elementFinder.findByPseudoSelector(this.webParser.parsedTreeRoot, originalParsedData.target);
+    let result = null;
+    if(foundElementData){
+      result = {
+        element: foundElementData.primitive.HtmlElement,
+        confidence: foundElementData.confidence,
+        similarResultsCount: foundElementData.similarResultsCount,
+        foundElementSimplePathJson: JSON.stringify(foundElementData.foundElementSimplePath),
+        targetSimplePathJson: JSON.stringify(foundElementData.targetSimplePath),
+        foundElementLocation: [this.getSimpleMessage(foundElementData.targetSimplePath)],
+        targetLocation: [this.getSimpleMessage(foundElementData.foundElementSimplePath)]
+      }
+    }
+    this.webParser.clearParserDataFromDOM();
+    return result
+  }
+
+  async getUncompressedParserData(dataUrl) {
+    if(this.downloadedImputs[dataUrl]){
+      return this.downloadedImputs[dataUrl];
+    }
     let result = {
       parserVersion: null,
       target: null,
       parsedData: null
     }
     try {
-      if (typeof (input) === 'string' && input.startsWith('http')) {
+      if (typeof (dataUrl) === 'string' && dataUrl.startsWith('http')) {
         let requestService = new BaseRequestService();
-        let fileContentResult = await requestService.getBlob(input);
+        let fileContentResult = await requestService.getBlob(dataUrl);
         let zipFile = await JSZip.loadAsync(fileContentResult);
-        input = await zipFile.file('value').async('string')
+        dataUrl = await zipFile.file('value').async('string')
       }
-      let parserStepData = JSON.parse(input);
+      let parserStepData = JSON.parse(dataUrl);
       if (!parserStepData || !parserStepData.data || parserStepData.data.length <= 0){
         return null;
       }
@@ -37,6 +72,7 @@ export default class ContextParserSearch {
       }
       result.target = parserStepData.target
       result.parserVersion = parserStepData.parserVersion
+      this.downloadedImputs[dataUrl] = result;
       return result;
     } catch(e){
       return null;

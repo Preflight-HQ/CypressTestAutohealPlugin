@@ -1,75 +1,22 @@
-import {first, sleepAsync} from "./globalHelpers";
 import preflightBaseApiService from "../APIs/preflightBaseApiService";
-import ContextParserSearch from "../ContextParserSearch";
-import ElementSelectorsSearch from "../ElementSelectorsSearch";
+import ContextParserSearchModule from "../ContextParserSearchModule";
+import ElementSelectorsSearchModule from "../ElementSelectorsSearchModule";
 import PreflightGlobalStore from "../PreflightGlobalStore";
+import ElementsSelector from "./ElementsSelector";
+import ElementFinderSearchData from "../models/ElementFinderSearchData";
+import ElementSearchResults from "../models/ElementSearchResults";
+import {ElementSearchMethod} from "../enums/ElementSearchMethod";
+import ElementSearchResult from "../models/ElementSearchResult";
 
 export default class ElementFinder {
   private doc: Document;
   public lastError:string = null;
-  public parentIframeSelector:string = null;
+  public elSelector:ElementsSelector = null;
+  public static readonly ReliableScore = 1.25;
 
   constructor(document: Document, parentIframeSelector: string){
     this.doc = document;
-    this.parentIframeSelector = parentIframeSelector;
-  }
-
-  public getElementsByXPath(xpath: string) : Element[]
-  {
-    let parent = this.parentIframeSelector ? this.doc.querySelector(this.parentIframeSelector) : this.doc;
-    let results = [];
-    let query = document.evaluate(xpath, parent,
-      null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    for (let i = 0, length = query.snapshotLength; i < length; ++i) {
-      results.push(query.snapshotItem(i));
-    }
-    return results;
-  }
-
-  public getElements(selector: string, parentSelector: string|null = this.parentIframeSelector): Element[]{
-    let parent = this.doc;
-    if (parentSelector){
-      // @ts-ignore
-      let iframeDoc = this.getFirstElement(parentSelector, null)?.contentDocument;
-      parent = iframeDoc || this.doc;
-    }
-    return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(parent.querySelectorAll(selector));
-  }
-
-  public getFirstElement(selector: string, parentSelector: string|null = this.parentIframeSelector): Element{
-    return first(this.getElements(selector, parentSelector));
-  }
-
-  private findFirstVisibleParent(element: Element, limit: number = 5){
-    let newElement = element;
-    for(let i = 0; i < limit; i++){
-      if(this.isElVisible(newElement)){
-        return newElement;
-      }
-      newElement = newElement.parentElement;
-    }
-    return element;
-  }
-
-  public async isElOnPage(selector: string, timeout: number = 5000){
-    let endTime = Date.now() + timeout
-    while(endTime > Date.now()) {
-      let elements = this.getElements(selector);
-      if(elements.length > 0 && this.isElVisible(elements[0])){
-        return true;
-      }
-      await sleepAsync(500);
-    }
-    return false;
-  }
-
-  public isXpathSelector(input: string) : boolean{
-    return input && !!input.match('^\\(*[.*]{0,1}/{1,2}')
-  }
-
-  public isElVisible(el) {
-    let result = !(el.offsetWidth === 0 && el.offsetHeight === 0);
-    return result;
+    this.elSelector = new ElementsSelector(this.doc, parentIframeSelector);
   }
 
   public async getTestAutohealData(testId: string, testTitle:string): Promise<any | null> {
@@ -103,50 +50,54 @@ export default class ElementFinder {
     if(!testAutohealData){
       return actionAutohealData;
     }
-    let selectors = this.getSelectorsFromAutohealData(actionAutohealData);
-    let elementSelectorsSearch = new ElementSelectorsSearch(this.doc);
-    elementSelectorsSearch.startSearch(selectors.css, selectors.xpath);
-    await sleepAsync(2000);
-    let bestResult = elementSelectorsSearch.stopSearch();
-    if(!bestResult){
-      return null;
+
+    let elFinderSearchData = new ElementFinderSearchData(actionAutohealData);
+    let elementSelectorsSearch = new ElementSelectorsSearchModule(this.elSelector);
+    let searchResults =  await elementSelectorsSearch.search(elFinderSearchData);
+    if(searchResults.isReliableResultFound){
+      return await this.getSearchResult(searchResults, actionAutohealData);
     }
-    let bestResultSelector = bestResult.selector;
-    let visibleElement = this.getVisibleElement(this.getElements(bestResultSelector), 3)
-    let parserElementSimplePath = await this.getElSimplePath(actionAutohealData);
-    return {
-      elementSimplePath: parserElementSimplePath || bestResultSelector,
-      selector: bestResultSelector,
-      element:  visibleElement
-    }
+    searchResults = await this.findElWithContextParser(actionAutohealData, searchResults);
+    return await this.getSearchResult(searchResults, actionAutohealData);
   }
 
-  private async getElSimplePath(actionAutohealData: any[]) {
+  private async findElWithContextParser(actionAutohealData: any[], previousSearchResults: ElementSearchResults) {
     let parserDataUrl = actionAutohealData.find(ads => ads.type == 'contextparserdata')?.value;
     if(!parserDataUrl){
       return null;
     }
-    let parserSearch = new ContextParserSearch(this.doc);
-    let simplePath = await parserSearch.getSimplePathFromActionData(parserDataUrl);
-    return parserSearch.getSimpleMessage(simplePath);
+    let parserSearch = new ContextParserSearchModule(this.doc);
 
-  }
-
-  public getVisibleElement(elements:Element[], findParentLimit:number = 5) {
-    let visibleElement = elements.find(e => this.isElVisible(e))
-    if(!visibleElement) {
-      visibleElement = this.findFirstVisibleParent(first(elements), findParentLimit);
+    let parserSearchResult = await parserSearch.findElement(parserDataUrl);
+    if(!parserSearchResult){
+      return previousSearchResults;
     }
-
-    return visibleElement;
+    let elSearchResult = new ElementSearchResult(parserSearchResult.element, ElementSearchMethod.CONTEXT_AWARENESS, 2*parserSearchResult.confidence);
+    elSearchResult.contextAwarenessResult = parserSearchResult;
+    previousSearchResults.searchResults.push(elSearchResult)
+    return previousSearchResults;
   }
 
-  private getSelectorsFromAutohealData(actionAutohealData: any[]){
-    let cssSelectors = actionAutohealData.filter(ads => ads.type.includes('css')).map(d => d.value);
-    let xpathSelectors = actionAutohealData.filter(ads => ads.type.includes('xpath')).map(d => d.value);
+  private async getSearchResult(searchResults: ElementSearchResults, actionData){
+    let bestResult = searchResults.bestResult;
+    if(!bestResult || bestResult.score < 1){
+      return 0;
+    }
+    let elementSimplePath: string = null;
+    if(bestResult.contextAwarenessResult){
+      elementSimplePath = bestResult.contextAwarenessResult.foundElementLocation;
+    } else {
+      let parserSearch = new ContextParserSearchModule(this.doc);
+      let parserDataUrl = actionData.find(ads => ads.type == 'contextparserdata')?.value;
+      elementSimplePath = parserSearch.getSimpleMessage(await parserSearch.getSimplePathFromActionData(parserDataUrl));
+    }
+    let visibleElement = this.elSelector.getVisibleElement([bestResult.element], 3)
+
     return {
-      xpath: xpathSelectors,
-      css: cssSelectors
+      elementSimplePath,
+      selector: bestResult.bestSelector,
+      element:  visibleElement
     }
   }
+
 }

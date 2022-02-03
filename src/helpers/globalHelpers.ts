@@ -13,3 +13,9 @@ export default function uuidv4() {
   // @ts-ignore
   return ([1e7] + 1e3 + 4e3 + 8e3 + 1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 }
+export function groupBy(xs: any[], key: string) {
+  return xs.reduce(function(rv: any, x: any) {
+    (rv[x[key]] = rv[x[key]] || []).push(x)
+    return rv
+  }, {})
+}

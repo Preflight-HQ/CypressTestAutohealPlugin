@@ -23,6 +23,6 @@
   ],
   "dependencies": {
     "jszip": "^3.7.1",
-    "preflight-web-parser": "^1.0.43"
+    "preflight-web-parser": "^1.0.46"
   }
 }
