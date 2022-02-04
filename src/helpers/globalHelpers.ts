@@ -19,3 +19,7 @@ export function groupBy(xs: any[], key: string) {
     return rv
   }, {})
 }
+export const toSentenceCase = camelCaseString => {
+  let result = camelCaseString.replace(/([A-Z])/g, ' $1');
+  return result.charAt(0).toUpperCase() + result.slice(1);
+};

@@ -50,7 +50,7 @@ export default class ElementsSelector {
     let endTime = Date.now() + timeout
     while(endTime > Date.now()) {
       let elements = this.getElements(selector);
-      if(elements.length > 0 && this.isElVisible(elements[0])){
+      if(elements.length > 0 && (this.isElVisible(elements[0]) || this.isFileInput(elements[0]))){
         return true;
       }
       await sleepAsync(500);
@@ -62,8 +62,12 @@ export default class ElementsSelector {
     return input && !!input.match('^\\(*[.*]{0,1}/{1,2}')
   }
 
+  public isFileInput(el){
+    return el.tagName === 'INPUT' && el.getAttribute('type')?.toLowerCase() == 'file';
+  }
+
   public isElVisible(el) {
-    let result = !(el.offsetWidth === 0 && el.offsetHeight === 0);
+    let result = (!(el.offsetWidth === 0 && el.offsetHeight === 0));
     return result;
   }
 

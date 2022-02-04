@@ -1,5 +1,6 @@
 export default class BaseRequestService {
   baseUrl = '';
+  public authHeaders: any = {};
 
   constructor(baseUrl = ''){
     this.baseUrl = baseUrl;
@@ -16,6 +17,15 @@ export default class BaseRequestService {
       if(contentType) {
         xhr.setRequestHeader("Content-Type", contentType);
       }
+
+      Object.keys(this.authHeaders).forEach(k => {
+        let value = this.authHeaders[k];
+        if(typeof  this.authHeaders[k] === 'function'){
+          value = this.authHeaders[k]();
+        }
+        xhr.setRequestHeader(k, value)
+      });
+
       xhr.onload = function () {
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
@@ -57,7 +67,10 @@ export default class BaseRequestService {
     return this.makeRequest('POST', url, data, null, null);
   }
 
-  get(endpoint){
+  get(endpoint, params = null){
+    if(params){
+      endpoint += '?' + Object.keys(params).map(p => `${p}=${params[p]}`).join('&')
+    }
     return this.makeRequest('GET', endpoint);
   }
 

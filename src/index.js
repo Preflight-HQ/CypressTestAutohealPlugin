@@ -7,6 +7,7 @@ import CloseEmailCommand from './commands/CloseEmailCommand';
 import loggerService from './helpers/loggerService';
 import GetElementCommand from './commands/GetElementCommand';
 import variablesProcessor from './helpers/variablesProcessor';
+import 'cypress-file-upload';
 
 beforeEach(function() {
   PreflightGlobalStore.initialize();
@@ -21,10 +22,10 @@ Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 });
 
 Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
-  if(value == '{{generate.email}}'){
-    value = variablesProcessor.generatedEmail;
-  }
-  return originalFn(element, value, options);
+  return new Cypress.Promise(async (resolve, reject) => {
+    value = await variablesProcessor.replaceVariables(value);
+    resolve(originalFn(element, value, options))
+  });
 })
 
 Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, possibleActionId = null) => {

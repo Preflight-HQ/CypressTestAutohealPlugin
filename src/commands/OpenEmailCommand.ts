@@ -3,6 +3,7 @@ import {first, sleepAsync} from "../helpers/globalHelpers";
 import EmailPreview from "../models/EmialPreview";
 import loggerService from "../helpers/loggerService";
 import variablesProcessor from "../helpers/variablesProcessor";
+// @ts-ignore
 import {distance as levenshteinDistance} from "fastest-levenshtein";
 
 export default class OpenEmailCommand {
@@ -18,6 +19,7 @@ export default class OpenEmailCommand {
     let endTime = Date.now() + timeout;
     let foundEmail: EmailPreview | null = null;
     while(endTime > Date.now()) {
+      loggerService.log('checkEmails', `Checking ${this.email} for received email "${subject}"` )
       let emails = await emailApiService.getEmails(this.email);
       foundEmail = this.findEmailBySubject(emails, subject);
       if(foundEmail){

@@ -15,7 +15,7 @@ context('Network Requests', () => {
         // the server sometimes gets an extra comment posted from another machine
         // which gets returned as 1 extra object
         expect(response.body).to.have.property('length').and.be.oneOf([500, 501])
-        expect(response).to.have.property('headers')
+        expect(response).to.have.property('authHeaders')
         expect(response).to.have.property('duration')
       })
   })
@@ -26,7 +26,7 @@ context('Network Requests', () => {
       // https://on.cypress.io/assertions
       expect(response).property('status').to.equal(200)
       expect(response).property('body').to.have.property('length').and.be.oneOf([500, 501])
-      expect(response).to.include.keys('headers', 'duration')
+      expect(response).to.include.keys('authHeaders', 'duration')
     })
   })
 
@@ -136,7 +136,7 @@ context('Network Requests', () => {
     cy.get('.network-post').click()
     cy.wait('@postComment').should(({ request, response }) => {
       expect(request.body).to.include('email')
-      expect(request.headers).to.have.property('content-type')
+      expect(request.authHeaders).to.have.property('content-type')
       expect(response && response.body).to.have.property('name', 'Using POST in cy.intercept()')
     })
 

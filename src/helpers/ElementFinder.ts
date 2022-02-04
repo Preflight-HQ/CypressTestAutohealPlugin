@@ -1,4 +1,3 @@
-import preflightBaseApiService from "../APIs/preflightBaseApiService";
 import ContextParserSearchModule from "../ContextParserSearchModule";
 import ElementSelectorsSearchModule from "../ElementSelectorsSearchModule";
 import PreflightGlobalStore from "../PreflightGlobalStore";
@@ -7,6 +6,7 @@ import ElementFinderSearchData from "../models/ElementFinderSearchData";
 import ElementSearchResults from "../models/ElementSearchResults";
 import {ElementSearchMethod} from "../enums/ElementSearchMethod";
 import ElementSearchResult from "../models/ElementSearchResult";
+import autohealApiService from "../APIs/autohealApiService";
 
 export default class ElementFinder {
   private doc: Document;
@@ -20,21 +20,15 @@ export default class ElementFinder {
   }
 
   public async getTestAutohealData(testId: string, testTitle:string): Promise<any | null> {
-    let requestData = {
-      testName: testTitle,
-      base64AuthKey: PreflightGlobalStore.autohealApiToken
-    }
-
     let currentTestData = PreflightGlobalStore.state.currentTestData;
     if(currentTestData) {
       return currentTestData;
     }
     try {
-      let autohealResponseJson = await preflightBaseApiService.post('Autoheal/TestData/' + testId, requestData);
-      if(!autohealResponseJson){
+      let autohealResponse = await autohealApiService.getData(testId, testTitle);
+      if(!autohealResponse){
         return null;
       }
-      let autohealResponse = JSON.parse(autohealResponseJson);
       let testAutohealData = JSON.parse(autohealResponse.dataJson);
       PreflightGlobalStore.state.currentTestData = testAutohealData;
       return testAutohealData;
