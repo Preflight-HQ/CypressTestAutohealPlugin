@@ -1,7 +1,7 @@
-import preflightBaseApiService from "./APIs/preflightBaseApiService";
+// @ts-ignore
 import * as JSZip from "jszip";
+// @ts-ignore
 import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig} from "preflight-web-parser";
-import baseRequestService from "./APIs/baseRequestService";
 import BaseRequestService from "./APIs/baseRequestService";
 
 export default class ContextParserSearchModule {
@@ -35,8 +35,8 @@ export default class ContextParserSearchModule {
         similarResultsCount: foundElementData.similarResultsCount,
         foundElementSimplePathJson: JSON.stringify(foundElementData.foundElementSimplePath),
         targetSimplePathJson: JSON.stringify(foundElementData.targetSimplePath),
-        foundElementLocation: [this.getSimpleMessage(foundElementData.targetSimplePath)],
-        targetLocation: [this.getSimpleMessage(foundElementData.foundElementSimplePath)]
+        foundElementLocation: [this.getSimpleMessage(foundElementData.foundElementSimplePath)],
+        targetLocation: [this.getSimpleMessage(foundElementData.targetSimplePath)]
       }
     }
     this.webParser.clearParserDataFromDOM();

@@ -12,8 +12,13 @@ class EmailApiService extends BaseRequestService {
   }
 
   public async getEmails(email: string): Promise<EmailPreview[]> {
-    let response = await this.get('List/' + email);
-    return JSON.parse(response) as EmailPreview[];
+    try {
+      let response = await this.get('List/' + email);
+      return JSON.parse(response) as EmailPreview[];
+    }
+    catch(e){
+      return [];
+    }
 
   }
 

@@ -1,4 +1,5 @@
 import {VariableParamEntity} from "../enums/VariableParamsEntity";
+import variablesProcessor from "./variablesProcessor";
 
 const escapeRegex = (input: string) => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -36,32 +37,16 @@ const isReusable = (obj: any) => {
 };
 
 const getUsedVariableObject = (value: string) => {
-  return null;
-  // return store.getters.getUsedVariables.find(({ systemname }) => value === systemname);
+  return variablesProcessor.usedVariables.find(({ systemname }) => value === systemname);
 };
 
-const isCheckpointVariable = (i) => false //(value: string) => store.getters.checkpointVariables.some(({ systemname }) => value === systemname);
+const isCheckpointVariable = (value: string) => null;
 
 const getCheckpointVariable = (systemname: string) => {
   return null
   // const variable = store.getters.checkpointVariables.find(v => v.systemname === systemname);
   // return variable ? variable.value : null;
 };
-
-// const setVariableIndex = ({ systemname: _systemname, index, variableParam }: { systemname: string; index: number; variableParam?: VariableParamEntity }) => {
-//   let systemname = _systemname;
-//   if (variableParam) {
-//     const paramValues = variableParam.options.map(o => o.value || o.defaultValue).filter(Boolean);
-//     if (paramValues.length) {
-//       systemname = _systemname.replace(/(}{2})/, `(${paramValues.join(',')})$1`);
-//     }
-//   }
-//   const reusable = isReusable(getVariableObject(systemname));
-//   if (reusable && isVariableIndexValid(index)) {
-//     return systemname.replace(/(}{2})/, `[${index + 1}]$1`);
-//   }
-//   return getSystemnameWithoutIndex(systemname);
-// };
 
 const processNotIndexedVariable = async ({
   variableObj,
@@ -107,6 +92,12 @@ const processVariable = async ({ input, actionValue, nodeValue, actionTypeVariab
   const systemnameWithoutIndex = getPureSystemname(input);
   const variableObj: any = getVariableObject(systemnameWithoutIndex, actionTypeVariables);
   const variableParams = getVariableParams(input);
+  if (isCheckpointVariable(systemnameWithoutIndex)) {
+    return processCheckpointVariable({ actionValue, input, nodeValue });
+  }
+  if (isVariableIndexValid(variableIndex)) {
+    return processIndexedVariable({ variableObj, actionValue, input, nodeValue, variableIndex: variableIndex || 0 });
+  }
   return processNotIndexedVariable({ variableObj, actionValue, input, nodeValue, variableParams });
 };
 

@@ -5,7 +5,7 @@ import actionVariablesHelper from "./actionVariablesHelper";
 import {getFakerVariables} from "./fakerVariables";
 
 class VariablesProcessor {
-  private get usedVariables() {
+  public get usedVariables() {
     if(!PreflightGlobalStore.state.variables.used){
       PreflightGlobalStore.state.variables.used = [];
     }
@@ -17,22 +17,37 @@ class VariablesProcessor {
     return email;
   }
 
+  public get generatedAdminEmail(): string{
+    let email = PreflightGlobalStore.state.variables.adminEmail || this.generateNewAdminEmail();
+    PreflightGlobalStore.state.variables.adminEmail = email;
+    return email;
+  }
+
   public generateNewEmail() {
     const email = `${uuidv4().substring(0, 16)}@${PreflightGlobalStore.emailDomain}`;
+    return email;
+  }
+
+  public generateNewAdminEmail() {
+    const email = `${uuidv4().substring(0, 16)}@${PreflightGlobalStore.adminEmailDomain}`;
     return email;
   }
 
   public async replaceVariables(input: string): Promise<string> {
     const inputVariables = actionVariablesHelper.extractVariablesFromInput(input, this.actionTypeVariables);
     let localValue = input;
-    for (let inputVariable of inputVariables) {
-      const { parsedSystemValue, parsedNodeValue } = await actionVariablesHelper.processVariable({
-        input: inputVariable,
-        actionValue: input,
-        nodeValue: input,
-        actionTypeVariables: this.actionTypeVariables
-      });
-      localValue = parsedNodeValue;
+    try {
+      for (let inputVariable of inputVariables) {
+        const {parsedSystemValue, parsedNodeValue} = await actionVariablesHelper.processVariable({
+          input: inputVariable,
+          actionValue: localValue,
+          nodeValue: localValue,
+          actionTypeVariables: this.actionTypeVariables
+        });
+        localValue = parsedNodeValue;
+      }
+    } catch (e) {
+      throw new Error('Resolving variables failed. ' + e.responseText );
     }
     return localValue;
   }
@@ -59,11 +74,11 @@ class VariablesProcessor {
     return value;
   };
 
-  private addUsedVariable(systemName, displayName, value) {
-    let usedVariable = this.usedVariables.find(uv => uv.systemName == systemName)
+  private addUsedVariable(systemname, displayName, value) {
+    let usedVariable = this.usedVariables.find(uv => uv.systemname == systemname)
     if(!usedVariable){
       this.usedVariables.push({
-        systemName,
+        systemname: systemname,
         displayName,
         values: [value]
       });
@@ -73,8 +88,8 @@ class VariablesProcessor {
 
   }
 
-  private isValueAlreadyGenerated(systemName: string, value: string){
-    let usedVals = this.usedVariables.find(uv => uv.systemName == systemName && uv.values && uv.values?.includes(value));
+  private isValueAlreadyGenerated(systemname: string, value: string){
+    let usedVals = this.usedVariables.find(uv => uv.systemname == systemname && uv.values && uv.values?.includes(value));
     return usedVals != null && usedVals.length > 0;
   }
 
@@ -125,7 +140,7 @@ class VariablesProcessor {
         hint: '{{shuffle}}@' + PreflightGlobalStore.emailDomain,
         reusable: false,
         generate: function() {
-          return varGen.processVariable({ ...this, generator: () => varGen.generatedEmail });
+          return varGen.processVariable({ ...this, generator: () => varGen.generatedAdminEmail });
         },
       },
       firstName: {

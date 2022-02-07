@@ -52,7 +52,8 @@ export default class BaseRequestService {
     return {
       status,
       statusText,
-      responseText
+      responseText: 'Connection to the Preflight server failed.',
+      responseTextDetail: responseText
     }
   }
 

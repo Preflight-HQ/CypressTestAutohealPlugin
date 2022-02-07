@@ -1,5 +1,5 @@
 import ElementFinder from './helpers/ElementFinder';
-import {first, sleepAsync} from './helpers/globalHelpers';
+import {escapeRegExp, first, sleepAsync} from './helpers/globalHelpers';
 import PreflightGlobalStore from './PreflightGlobalStore';
 import {dragAndDrop} from './helpers/commandHelpers';
 import OpenEmailCommand from './commands/OpenEmailCommand';
@@ -9,8 +9,13 @@ import GetElementCommand from './commands/GetElementCommand';
 import variablesProcessor from './helpers/variablesProcessor';
 import 'cypress-file-upload';
 
-beforeEach(function() {
+beforeEach(async function() {
   PreflightGlobalStore.initialize();
+});
+
+before(function() {
+  PreflightGlobalStore.fixedFiles = [];
+  PreflightGlobalStore.testsStart = new Date();
 });
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
@@ -23,10 +28,25 @@ Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 
 Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
   return new Cypress.Promise(async (resolve, reject) => {
-    value = await variablesProcessor.replaceVariables(value);
-    resolve(originalFn(element, value, options))
+    try {
+      value = await variablesProcessor.replaceVariables(value);
+      resolve(originalFn(element, value, options))
+    } catch(e){
+      reject(e.message);
+    }
   });
 })
+
+Cypress.Commands.overwrite('should', (originalFn, element, chainer, value) => {
+  return new Cypress.Promise(async (resolve, reject) => {
+    try {
+      value = await variablesProcessor.replaceVariables(value);
+      resolve(originalFn(element, chainer, value))
+    } catch(e){
+      reject(e.message);
+    }
+  });
+});
 
 Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, possibleActionId = null) => {
   let isOptionsActionId = typeof optionsOrActionId === 'number' || typeof optionsOrActionId === 'string';
@@ -68,8 +88,37 @@ Cypress.Commands.add('autohealReport', () => {
     position++;
     log('update request', out)
   });
+  let testFile =  Cypress.mocha.getRunner().test.invocationDetails.absoluteFile;
 
+  let dotIndex = testFile.lastIndexOf('.');
+  let testFileArray = testFile.split('');
+  testFileArray.splice(dotIndex, 0, `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`);
+  let fixedFileName = testFileArray.join('');
+
+
+  if(PreflightGlobalStore.fixedFiles[testFile]){
+    PreflightGlobalStore.fixedFiles[testFile] = replaceSelectorsInTests(PreflightGlobalStore.fixedFiles[testFile], reportData);
+    cy.writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
+  } else {
+    cy.readFile(testFile)
+      .then(file => {
+        PreflightGlobalStore.fixedFiles[testFile] = replaceSelectorsInTests(file, reportData);
+        cy.writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
+      });
+  }
 });
+
+function replaceSelectorsInTests(fileContent, reportData){
+  reportData.forEach(t => {
+    let oldSelector = escapeRegExp(t.originalSelector);
+    let pattern = String.raw`cy\.initializeAutoheal\('${PreflightGlobalStore.state.currentTestId}'\).*cy\.get\('(${oldSelector})', ${t.actionId}\)`;
+    const regex = new RegExp(pattern, 'gms')
+    fileContent = fileContent.replace(regex, (g0, g1, position) => {
+      return g0.replace(g1, t.newSelector)
+    });
+  });
+  return fileContent;
+}
 
 Cypress.Commands.add('openEmail', (subject, timeout = 30000) => {
   let openEmailCommand = new OpenEmailCommand(cy.state('window').document);
