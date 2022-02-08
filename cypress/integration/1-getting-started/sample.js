@@ -1,10 +1,6 @@
 Cypress.PreflightAutohealApiToken = 'e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ==';
 
 
-
-
-
-
 describe('test', () => {
   it('Dashboard | YourWebApp', () => {
     cy.viewport(1440, 900);

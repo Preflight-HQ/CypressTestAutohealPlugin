@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "NODE_ENV=production tsc",
+    "build:dev": "tsc",
     "test": "cypress run",
     "cy:open": "cypress open",
     "semantic-release": "semantic-release"

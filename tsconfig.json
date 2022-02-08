@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": true,
+    "declaration": false,
     "outDir": "./dist",
     "experimentalDecorators": true,
     "module": "es6",
