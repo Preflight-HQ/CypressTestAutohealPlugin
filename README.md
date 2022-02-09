@@ -2,25 +2,25 @@
 
 ## Install with npm
 
-```shell
-npm install -D preflight-cypress-plugin
+```
+npm install -D @preflight-hq/preflight-cypress-plugin
 ```
 Then include in your project's `cypress/support/index.js`
 
 ```js
-require('preflight-cypress-plugin')
+require('@preflight-hq/preflight-cypress-plugin')
 ```
 
 ## Create account on https://app.preflight.com/
  - Create API key
  
 ## Set API key in your test environment
-- You can set key in code like  `Cypress.PreflightApiKey = [YOUR_KEY];`
+- You can set key in code like  `Cypress.PreflightApiKey = [YOUR_API_KEY];`
 - Or set Cypress env in your `cypress.json` file. 
 
 ```
 "env": {
-  "PREFLIGHT_API_KEY": "e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ=="
+  "PREFLIGHT_API_KEY": "[YOUR_API_KEY]"
  }
 ```
 - For enabling advanced Preflight features, the plugin needs to communicate with the API. 
@@ -35,12 +35,11 @@ For that case you need to allow HTTP requests in your tests by adding following 
 - Download Chrome extension `Preflight Cypress code generator` here: https://chrome.google.com/webstore/detail/preflight-recorder/onlgiehoglnklmgeiekdpaakjkleafle
 - Log in and follow instructions on the video below to create your first test. 
 
-![Create test](https://user-images.githubusercontent.com/17752807/153217614-f1fd9cfa-7963-4af0-a814-79a3ff0d4454.gif)
-
-
+<img src="https://preflightuploads.blob.core.windows.net/uploads/PreflightCypressCodeGenerator.gif" alt="Create test">
 
 ### Generated code 
 ```
+    Cypress.PreflightApiKey = [YOUR_API_KEY];
     describe('test', () => {
       it('Login | YourWebApp', () => {
         cy.viewport(1440, 900);
