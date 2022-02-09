@@ -89,11 +89,11 @@ Cypress.Commands.add('autoheal', () => {
     log('update request', out)
   });
   let testFile =  Cypress.mocha.getRunner().test.invocationDetails.absoluteFile;
-
-  let dotIndex = testFile.lastIndexOf('.');
-  let testFileArray = testFile.split('');
-  testFileArray.splice(dotIndex, 0, `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`);
-  let fixedFileName = testFileArray.join('');
+  let fixedFileName = testFile + `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`;
+  // let dotIndex = testFile.lastIndexOf('.');
+  // let testFileArray = testFile.split('');
+  // testFileArray.splice(dotIndex, 0, `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`);
+  // let fixedFileName = testFileArray.join('');
 
 
   if(PreflightGlobalStore.fixedFiles[testFile]){

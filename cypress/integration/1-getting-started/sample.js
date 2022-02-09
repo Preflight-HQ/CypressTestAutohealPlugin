@@ -1,4 +1,4 @@
-Cypress.PreflightApiKey = 'e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ==';
+Cypress.PreflightApiKey = 'ZDE4ODlhOWMtYTNiZi00MmI5LWE0ZjYtZGZkMjE5ZWEyZWRlOmNiYjdkZmYzLTY3MDgtNGVkYy04MzE3LTRhYTU0YWNhOWM1Zg==';
 
 
 describe('test', () => {
@@ -26,7 +26,6 @@ describe('test', () => {
 // TODO better selectors generator
 // TODO Admin email
 // TODO Documentation
-// TODO extension better handling of test save fail
 
 
 // describe('test', () => {

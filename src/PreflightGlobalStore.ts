@@ -3,7 +3,7 @@ export default class PreflightGlobalStore {
   constructor() {
     throw new Error('cannot instantiate using a static class');
   }
-  public static apiUrl:string = 'https://localhost:44365/v1/';
+  public static apiUrl:string = 'https://apidev.preflightdev.com/v1/';
   public static authServerUrl:string = 'https://authdev.preflightdev.com';
   public static emailDomain:string = 'test-dev.preflight.com';
   public static adminEmailDomain:string = 'testadmin-dev.preflight.com';

@@ -13,7 +13,7 @@ export default class BaseRequestService {
     return PreflightGlobalStore.ApiKey;
   }
 
-  makeRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = true) : Promise<string|null> {
+  makeRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = false) : Promise<string|null> {
     return new Promise(async (resolve, reject) => {
       let xhr = new XMLHttpRequest();
       let that = this;
@@ -46,11 +46,11 @@ export default class BaseRequestService {
 
   async makeAuthRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8") : Promise<string|null> {
     try {
-      return await this.makeRequest(method, endpoint, data, responseType, contentType);
+      return await this.makeRequest(method, endpoint, data, responseType, contentType, true);
     } catch (e) {
       if(e.status == 401){
         await authService.getAccessToken(this.apiKey, true);
-        return await this.makeRequest(method, endpoint, data, responseType, contentType);
+        return await this.makeRequest(method, endpoint, data, responseType, contentType, true);
       } else {
         throw e;
       }

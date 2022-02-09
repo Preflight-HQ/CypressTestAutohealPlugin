@@ -27,3 +27,7 @@ export const toSentenceCase = camelCaseString => {
 export const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+export const base64ToString = (input) => {
+  return decodeURIComponent(atob( input ))
+}

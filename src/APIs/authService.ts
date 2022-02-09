@@ -1,5 +1,6 @@
 import PreflightGlobalStore from "../PreflightGlobalStore";
 import BaseRequestService from "./baseRequestService";
+import {base64ToString} from "../helpers/globalHelpers";
 
 class AuthService {
   private get authServerUrl() {
@@ -10,9 +11,10 @@ class AuthService {
       return PreflightGlobalStore.ApiToken;
     }
     let rqService = new BaseRequestService(this.authServerUrl);
+    let clientDetails = this.apiKeyToClientDetails(apiKey);
     let authData = {
-      client_id: 'd1889a9c-a3bf-42b9-a4f6-dfd219ea2ede',
-      client_secret: 'cbb7dff3-6708-4edc-8317-4aa54aca9c5f',
+      client_id: clientDetails.clientId,
+      client_secret: clientDetails.clientSecret,
       grant_type: 'client_credentials',
       scope: 'tests_run'
     };
@@ -21,6 +23,22 @@ class AuthService {
     let apiTokenResponse = JSON.parse(apiTokenResponseJson);
     PreflightGlobalStore.ApiToken = apiTokenResponse.access_token;
     return PreflightGlobalStore.ApiToken;
+  }
+
+  private apiKeyToClientDetails(apiKey: string) {
+    try {
+      let clientDetails = base64ToString(apiKey)?.split(':');
+      if (!clientDetails || clientDetails.length < 2) {
+        throw new Error('ApiToken not found or has invalid format');
+      }
+      return {
+        clientId: clientDetails[0],
+        clientSecret: clientDetails[1]
+
+      }
+    } catch(e){
+      throw new Error(`ApiToken "${apiKey}" has invalid format`);
+    }
   }
 }
 
