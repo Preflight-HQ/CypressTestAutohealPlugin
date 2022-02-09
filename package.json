@@ -1,5 +1,5 @@
 {
-  "name": "preflight-test-autoheal",
+  "name": "preflight-cypress-plugin",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -27,7 +27,6 @@
     "cypress-file-upload": "^5.0.8",
     "faker": "^5.5.3",
     "fastest-levenshtein": "^1.0.12",
-    "jszip": "^3.7.1",
-    "preflight-web-parser": "^1.0.46"
+    "jszip": "^3.7.1"
   }
 }

@@ -6,9 +6,6 @@ import EmailDetail from "../models/EmialDetail";
 class AutohealApiService extends BaseRequestService {
   constructor() {
     super(PreflightGlobalStore.apiUrl + 'ExternalTestDriver/AutohealTestData/');
-    this.authHeaders = {
-      'base64AuthKey': () => PreflightGlobalStore.autohealApiToken
-    }
   }
 
   public async getData(testId: string, testName:any): Promise<any> {

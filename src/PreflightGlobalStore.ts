@@ -1,11 +1,13 @@
 export default class PreflightGlobalStore {
+  public static ApiToken:string = null;
   constructor() {
     throw new Error('cannot instantiate using a static class');
   }
-  public static apiUrl:string = 'https://apidev.preflightdev.com/v1/';
+  public static apiUrl:string = 'https://localhost:44365/v1/';
+  public static authServerUrl:string = 'https://authdev.preflightdev.com';
   public static emailDomain:string = 'test-dev.preflight.com';
   public static adminEmailDomain:string = 'testadmin-dev.preflight.com';
-  public static autohealApiToken:string|null;
+  public static ApiKey:string|null;
   public static fixedFiles: string[] = [];
   public static testsStart: Date;
   public static state: any = {

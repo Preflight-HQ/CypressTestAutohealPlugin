@@ -1,4 +1,4 @@
-Cypress.PreflightAutohealApiToken = 'e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ==';
+Cypress.PreflightApiKey = 'e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ==';
 
 
 describe('test', () => {
@@ -6,7 +6,7 @@ describe('test', () => {
     cy.viewport(1440, 900);
     cy.initializeAutoheal('ef4sspsl2YmK');
     cy.visit('https://yourweb.app/#/signup');
-    cy.get('//label[text()="First name"]/..//input', 2).type('{{name.firstName}}');
+    cy.get('//bel[text()="First name"]/..//input', 2).type('{{name.firstName}}');
     cy.get('//label[text()="Last name"]/..//input', 3).type('{{name.lastName}}');
     cy.get('//label[text()="Email address"]/..//input', 4).type('{{generate.email}}');
     cy.get('//label[text()="Password"]/..//input', 5).type('123456');
@@ -19,11 +19,14 @@ describe('test', () => {
     cy.get('//label[text()="Password"]/..//input', 12).type('123456');
     cy.get('//button[descendant::text()=" Sign in "]', 13).click();
     cy.get('.py-6 > .flex-1 > :nth-child(1) > :nth-child(2) > div.flex > .ml-3', 14).should('include.text', 'Good morning, {{name.firstName[1]}} {{name.lastName[1]}}');
-    cy.autohealReport();
+    cy.autoheal();
   })
 })
 
-
+// TODO better selectors generator
+// TODO Admin email
+// TODO Documentation
+// TODO extension better handling of test save fail
 
 
 // describe('test', () => {
@@ -31,7 +34,7 @@ describe('test', () => {
 //     cy.viewport(1440, 900);
 //     cy.initializeAutoheal('deQNPedb2bIA');
 //     cy.visit('https://yourweb.app/#/login');
-//     cy.get('#pf-lesson-login-0', 2).type('{{generate.email}}');
+//     cy.get('#lesson-login-0', 2).type('{{generate.email}}');
 //     cy.get('#pf-lesson-login-0').should('include.text', '{{generate.email}}');
 //     cy.get('input[id="pf-lesson-login-1"]', 3).type('{{generate.email}}');
 //     cy.get('input#remember_me', 4).click();
@@ -44,7 +47,7 @@ describe('test', () => {
 //     cy.autohealReport();
 //   })
 // })
-//
+
 
 
 

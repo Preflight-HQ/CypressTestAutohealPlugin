@@ -7,7 +7,7 @@ class EmailApiService extends BaseRequestService {
   constructor() {
     super(PreflightGlobalStore.apiUrl + 'ExternalTestDriver/Emails/');
     this.authHeaders = {
-      'base64AuthKey': () => PreflightGlobalStore.autohealApiToken
+      'base64AuthKey': () => PreflightGlobalStore.ApiKey
     }
   }
 

@@ -1,0 +1,11 @@
+export declare function clearString(input: string): string;
+export declare function arrayIntersection(array1: any[], array2: any[]): any[];
+export declare function last(array: any[]): any;
+export declare function first(array: any[]): any;
+export declare function firstCommonEl(inputArrays: any[], fn?: (a: any, b: any) => boolean): any;
+export declare function intersection(inputArrays: any[], fn?: (a: any, b: any) => boolean, breakOnFirst?: boolean): any[];
+export declare function round(input: number, precision: number): number;
+export declare function dotProduct(xs: number[], ys: number[]): number | undefined;
+export declare function zipWith(f: ((a: number, b: number) => number), xs: number[], ys: number[]): number[];
+export declare function groupBy(xs: any[], key: string): any;
+export declare function occurencesCount(arr: any[]): any;

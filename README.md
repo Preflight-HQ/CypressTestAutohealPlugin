@@ -1,9 +1,9 @@
-# preflight-test-autoheal
+# preflight-cypress-plugin
 
 ## Install with npm
 
 ```shell
-npm install -D preflight-test-autoheal
+npm install -D preflight-cypress-plugin
 ```
 Then include in your project's `cypress/support/index.js`
 
@@ -14,11 +14,13 @@ require('preflight-test-autoheal')
 ## Create account on https://app.preflight.com/
  - Create API key
 ## Set API key in your test envorinment
-- you can set key in code like  `Cypress.PreflightAutohealApiToken = [YOUR_KEY];`
+- you can set key in code like  `Cypress.PreflightApiKey = [YOUR_KEY];`
 - or set it in Cypress env 
 
 ```
 "env": {
-  "PREFLIGHT_AUTOHEAL_API_TOKEN": "e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ=="
+  "PREFLIGHT_API_KEY": "e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ=="
  }
 ```
+
+Enable CORS

@@ -1,6 +1,6 @@
 {
   "env": {
-    "PREFLIGHT_TEST_AUTOHEAL_API_TOKEN": "e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ=="
+    "PREFLIGHT_API_KEY": "e2NvbXBhbnlJZDoiMSIsc2VjcmV0OiJDT205QTVlTEhCQ3U2d2QifQ=="
   },
   "chromeWebSecurity": false
 }

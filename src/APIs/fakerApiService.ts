@@ -7,7 +7,7 @@ class FakerApiService extends BaseRequestService {
   constructor() {
     super(PreflightGlobalStore.apiUrl + 'ExternalTestDriver/Variables/');
     this.authHeaders = {
-      'base64AuthKey': () => PreflightGlobalStore.autohealApiToken
+      'base64AuthKey': () => PreflightGlobalStore.ApiKey
     }
   }
 

@@ -20,8 +20,8 @@ before(function() {
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 
-  if(!PreflightGlobalStore.autohealApiToken){
-    PreflightGlobalStore.autohealApiToken = Cypress.env('PREFLIGHT_TEST_AUTOHEAL_API_TOKEN') || Cypress.PreflightAutohealApiToken || process.env.PREFLIGHT_AUTOHEAL_API_TOKEN
+  if(!PreflightGlobalStore.ApiKey){
+    PreflightGlobalStore.ApiKey = Cypress.env('PREFLIGHT_API_KEY') || Cypress.PreflightApiKey || process.env.PREFLIGHT_API_KEY
   }
   PreflightGlobalStore.state.currentTestId = autohealTestDataId;
 });
@@ -77,7 +77,7 @@ function log(name, message, el = null, options = null) {
   Cypress.log({name, message, $el:el });
 }
 
-Cypress.Commands.add('autohealReport', () => {
+Cypress.Commands.add('autoheal', () => {
   let reportData = PreflightGlobalStore.state.testReport;
   if(!reportData || reportData.length <= 0){
     return;

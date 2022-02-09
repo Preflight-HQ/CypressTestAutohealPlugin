@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as JSZip from "jszip";
 // @ts-ignore
-import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig} from "preflight-web-parser";
+import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig} from "./packages/preflight-web-parser";
 import BaseRequestService from "./APIs/baseRequestService";
 
 export default class ContextParserSearchModule {
@@ -55,7 +55,7 @@ export default class ContextParserSearchModule {
     try {
       if (typeof (dataUrl) === 'string' && dataUrl.startsWith('http')) {
         let requestService = new BaseRequestService();
-        let fileContentResult = await requestService.getBlob(dataUrl);
+        let fileContentResult = await requestService.getBlob(dataUrl, false);
         let zipFile = await JSZip.loadAsync(fileContentResult);
         dataUrl = await zipFile.file('value').async('string')
       }
