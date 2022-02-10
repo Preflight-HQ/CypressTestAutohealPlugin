@@ -6,12 +6,10 @@ export default class ElementFinderSearchData {
   }
 
   public get mainSelectors(): string[] {
-    return [];
     return this.actionData.filter(ads => ads.type == 'cssselector' || ads.type == 'xpathselector').map(d => d.value);
   }
 
   public get possibleSelectors(): string[] {
-    return [];
     return this.actionData.filter(ads => ads.type == 'possiblecssselector' || ads.type == 'possiblexpathselector').map(d => d.value);
   }
 

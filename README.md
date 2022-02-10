@@ -23,12 +23,6 @@ require('@preflight-hq/preflight-cypress-plugin')
   "PREFLIGHT_API_KEY": "[YOUR_API_KEY]"
  }
 ```
-- For enabling advanced Preflight features, the plugin needs to communicate with the API. 
-For that case you need to allow HTTP requests in your tests by adding following configuration to your `cypress.json` file.
-
-```
-  "chromeWebSecurity": false
-```
 
 ## Creating test
 - Once you have the plugin installed and set up with the API key you can create your first test.

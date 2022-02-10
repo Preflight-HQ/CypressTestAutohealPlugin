@@ -1,5 +1,3 @@
-Cypress.PreflightApiKey = 'ZDE4ODlhOWMtYTNiZi00MmI5LWE0ZjYtZGZkMjE5ZWEyZWRlOmNiYjdkZmYzLTY3MDgtNGVkYy04MzE3LTRhYTU0YWNhOWM1Zg==';
-
 
 describe('test', () => {
   it('Dashboard | YourWebApp', () => {

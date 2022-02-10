@@ -7,6 +7,7 @@ import CloseEmailCommand from './commands/CloseEmailCommand';
 import loggerService from './helpers/loggerService';
 import GetElementCommand from './commands/GetElementCommand';
 import variablesProcessor from './helpers/variablesProcessor';
+import BaseRequestService from './APIs/baseRequestService';
 import 'cypress-file-upload';
 
 beforeEach(async function() {
@@ -168,6 +169,27 @@ Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
 
 });
 loggerService.log = log;
+BaseRequestService.RequestFunction = (method, url, data, responseType, contentType, accessToken) => {
+  return new Cypress.Promise((resolve, reject) => {
+    try {
+      Cypress.backend('http:request', {
+        method,
+        url,
+        auth: accessToken ? { bearer: accessToken } : null,
+        log: false,
+        headers: {
+          "Content-Type": contentType
+        },
+        encoding: responseType == 'blob' ? 'binary' : 'utf8',
+        body: data
+      }).then(result => {
+        resolve(result)
+      })
+    } catch (e) {
+      reject(e)
+    }
+  });
+}
 
 
 

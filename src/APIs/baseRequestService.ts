@@ -4,6 +4,7 @@ import authService from "./authService";
 export default class BaseRequestService {
   baseUrl = '';
   public authHeaders: any = {};
+  public static RequestFunction: (method, url, data, responseType, contentType, authorize) => any = null
 
   constructor(baseUrl = ''){
     this.baseUrl = baseUrl;
@@ -14,6 +15,20 @@ export default class BaseRequestService {
   }
 
   makeRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = false) : Promise<string|null> {
+    let accessToken = null
+    if(BaseRequestService.RequestFunction){
+      return new Promise(async (resolve, reject) => {
+        if(authorize){
+          accessToken = await authService.getAccessToken(this.apiKey);
+        }
+        let result = await BaseRequestService.RequestFunction(method, this.baseUrl + endpoint, data, responseType, contentType, accessToken);
+        resolve(typeof result.body !== 'string' ? JSON.stringify(result.body) : result.body);
+      });
+    }
+
+  }
+
+  xhrRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = false){
     return new Promise(async (resolve, reject) => {
       let xhr = new XMLHttpRequest();
       let that = this;
