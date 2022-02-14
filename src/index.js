@@ -9,6 +9,7 @@ import GetElementCommand from './commands/GetElementCommand';
 import variablesProcessor from './helpers/variablesProcessor';
 import BaseRequestService from './APIs/baseRequestService';
 import 'cypress-file-upload';
+import SelectorsGenerator from './helpers/SelectorsGeenrator/SelectorsGenerator';
 
 beforeEach(async function() {
   PreflightGlobalStore.initialize();
@@ -55,12 +56,11 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
   let getOptions = isOptionsActionId ? {} :  optionsOrActionId;
   let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
   let doc = cy.state('window').document;
-  let getSelectorFn = (el) => Cypress.SelectorPlayground.getSelector(Cypress.$(el)); // TODO better selector generator
 
   return new Cypress.Promise(async (resolve, reject) => {
     try {
       await sleepAsync(100);
-      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle, getSelectorFn);
+      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle);
       if(await getCommand.canBeHandledWithOriginalGet()) {
         return resolve(originalFn(selector, getOptions));
       }
@@ -171,23 +171,23 @@ Cypress.Commands.add('dragAndDrop', (dragSelector, dropSelector) => {
 loggerService.log = log;
 BaseRequestService.RequestFunction = (method, url, data, responseType, contentType, accessToken) => {
   return new Cypress.Promise((resolve, reject) => {
-    try {
-      Cypress.backend('http:request', {
-        method,
-        url,
-        auth: accessToken ? { bearer: accessToken } : null,
-        log: false,
-        headers: {
-          "Content-Type": contentType
-        },
-        encoding: responseType == 'blob' ? 'binary' : 'utf8',
-        body: data
-      }).then(result => {
+    Cypress.backend('http:request', {
+      method,
+      url,
+      auth: accessToken ? { bearer: accessToken } : null,
+      log: false,
+      headers: {
+        "Content-Type": contentType
+      },
+      encoding: responseType == 'blob' ? 'binary' : 'utf8',
+      body: data
+    }).then(result => {
+      if(result.status >= 200 && result.status < 300 ) {
         resolve(result)
-      })
-    } catch (e) {
-      reject(e)
-    }
+      } else {
+        reject(result)
+      }
+    })
   });
 }
 

@@ -3,6 +3,7 @@ import loggerService from "../helpers/loggerService";
 import PreflightGlobalStore from "../PreflightGlobalStore";
 import reportService from "../helpers/reportService";
 import ElementsSelector from "../helpers/ElementsSelector";
+import SelectorsGenerator from "../helpers/SelectorsGeenrator/SelectorsGenerator";
 
 export default class GetElementCommand {
   private readonly doc: Document;
@@ -12,10 +13,9 @@ export default class GetElementCommand {
   private readonly actionId: string;
   private elSelector: ElementsSelector;
   private elFinder: ElementFinder;
-  private getSelectorFn;
   private _isElMainSelOnPage: boolean | undefined = undefined;
 
-  constructor(document: Document, selector, options, actionId, testTitle, getSelectorFn) {
+  constructor(document: Document, selector, options, actionId, testTitle) {
     this.doc = document;
     this.actionId = actionId;
     this.mainSelector = selector;
@@ -23,7 +23,6 @@ export default class GetElementCommand {
     this.testTitle = testTitle;
     this.elSelector = new ElementsSelector(this.doc, this.parentIframeSelector);
     this.elFinder = new ElementFinder(this.doc, this.parentIframeSelector);
-    this.getSelectorFn = getSelectorFn;
   }
 
   public get parentIframeSelector(): string|null {
@@ -72,7 +71,8 @@ export default class GetElementCommand {
       return;
     }
     if(!searchResult.selector) {
-      searchResult.selector = this.getSelectorFn(searchResult.element);
+      let generator = new SelectorsGenerator(this.doc);
+      searchResult.selector = generator.getBestSelector(searchResult.element)?.value;
     }
     loggerService.log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, this.options);
     reportService.pushData(this.mainSelector, this.actionId, searchResult);

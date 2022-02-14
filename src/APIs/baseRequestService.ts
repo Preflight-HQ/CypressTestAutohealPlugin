@@ -16,13 +16,21 @@ export default class BaseRequestService {
 
   makeRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = false) : Promise<string|null> {
     let accessToken = null
-    if(BaseRequestService.RequestFunction){
+    if(BaseRequestService.RequestFunction) {
       return new Promise(async (resolve, reject) => {
-        if(authorize){
-          accessToken = await authService.getAccessToken(this.apiKey);
+        try {
+          if (authorize) {
+            accessToken = await authService.getAccessToken(this.apiKey);
+          }
+          let result = await BaseRequestService.RequestFunction(method, this.baseUrl + endpoint, data, responseType, contentType, accessToken);
+          resolve(typeof result.body !== 'string' ? JSON.stringify(result.body) : result.body);
+        } catch (e) {
+          reject({
+            status: e.status,
+            statusText: e.statusText,
+            responseText: e.body,
+          })
         }
-        let result = await BaseRequestService.RequestFunction(method, this.baseUrl + endpoint, data, responseType, contentType, accessToken);
-        resolve(typeof result.body !== 'string' ? JSON.stringify(result.body) : result.body);
       });
     }
 
