@@ -11,8 +11,8 @@ Then include in your project's `cypress/support/index.js`
 require('@preflight-hq/preflight-cypress-plugin')
 ```
 
-## Create account on https://app.preflight.com/
- - Create API key
+## Create an account on https://app.preflight.com/get-started?afmc=cypressPlugin
+ - The API key will be generated for you after creating account.
  
 ## Set API key in your test environment
 - You can set key in code like  `Cypress.PreflightApiKey = [YOUR_API_KEY];`
@@ -26,7 +26,7 @@ require('@preflight-hq/preflight-cypress-plugin')
 
 ## Creating test
 - Once you have the plugin installed and set up with the API key you can create your first test.
-- Download Chrome extension `Preflight Cypress code generator` here: https://chrome.google.com/webstore/detail/preflight-recorder/onlgiehoglnklmgeiekdpaakjkleafle
+- Download Chrome extension `Cypress Recorder from Preflight` here: https://chrome.google.com/webstore/detail/lpfigbkckbojbjnmhapmfekljbhclhhj
 - Log in and follow instructions on the video below to create your first test. 
 
 <img src="https://preflightuploads.blob.core.windows.net/uploads/PreflightCypressCodeGenerator.gif" alt="Create test">
