@@ -25,7 +25,7 @@ class AuthService {
       PreflightGlobalStore.ApiToken = apiTokenResponse.access_token;
       return PreflightGlobalStore.ApiToken;
     } catch (e) {
-      e.responseText = 'Authorization failed. Please check your API key.';
+      e.responseText = 'Authorization failed. Please check your Preflight API key.';
       throw e
     }
   }

@@ -1,13 +1,14 @@
 {
   "name": "@preflight-hq/preflight-cypress-plugin",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production tsc",
-    "build:dev": "tsc",
+    "build:dev": "copy .env.development ./dist/.env & tsc",
     "test": "cypress run",
     "cy:open": "cypress open",
+    "cy:open:dev": "copy .env.development ./dist/.env & cypress open",
     "semantic-release": "semantic-release"
   },
   "keywords": [],
