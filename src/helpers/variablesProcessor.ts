@@ -47,7 +47,7 @@ class VariablesProcessor {
         localValue = parsedNodeValue;
       }
     } catch (e) {
-      throw new Error('Resolving variables failed. ' + e.responseText );
+      throw new Error('Resolving variables failed. ' + (e.responseText ? e.responseText : e.statusText ));
     }
     return localValue;
   }

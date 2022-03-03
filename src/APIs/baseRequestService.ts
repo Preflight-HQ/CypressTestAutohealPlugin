@@ -28,7 +28,7 @@ export default class BaseRequestService {
           reject({
             status: e.status,
             statusText: e.statusText,
-            responseText: e.body,
+            responseText: e.body ? e.body : JSON.stringify(e.responseText),
           })
         }
       });
