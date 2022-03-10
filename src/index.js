@@ -31,6 +31,9 @@ Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
 Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
   return new Cypress.Promise(async (resolve, reject) => {
     try {
+      if(!element){
+        reject('Element cannot be null.');
+      }
       value = await variablesProcessor.replaceVariables(value);
       resolve(originalFn(element, value, options))
     } catch(e){
@@ -64,7 +67,11 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, poss
       if(await getCommand.canBeHandledWithOriginalGet()) {
         return resolve(originalFn(selector, getOptions));
       }
-      resolve(await getCommand.process());
+      let element = await getCommand.process();
+      if(!element){
+        reject('Element not found.');
+      }
+      resolve(element);
     } catch (e) {
       reject(e.message);
     }

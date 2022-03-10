@@ -86,10 +86,9 @@ export default class ElementFinder {
       elementSimplePath = parserSearch.getSimpleMessage(await parserSearch.getSimplePathFromActionData(parserDataUrl));
     }
     let visibleElement = this.elSelector.getVisibleElement([bestResult.element], 3)
-
     return {
       elementSimplePath,
-      selector: bestResult.bestSelector,
+      selector: bestResult?.bestSelector,
       element:  visibleElement
     }
   }

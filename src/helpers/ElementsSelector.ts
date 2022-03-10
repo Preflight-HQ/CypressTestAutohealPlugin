@@ -13,7 +13,7 @@ export default class ElementsSelector {
   {
     let parent = this.parentIframeSelector ? this.doc.querySelector(this.parentIframeSelector) : this.doc;
     let results = [];
-    let query = document.evaluate(xpath, parent,
+    let query = this.doc.evaluate(xpath, parent,
       null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
     for (let i = 0, length = query.snapshotLength; i < length; ++i) {
       results.push(query.snapshotItem(i));
@@ -36,6 +36,9 @@ export default class ElementsSelector {
   }
 
   public findFirstVisibleParent(element: Element, limit: number = 5){
+    if(!element){
+      return null;
+    }
     let newElement = element;
     for(let i = 0; i < limit; i++){
       if(this.isElVisible(newElement)){
@@ -67,7 +70,7 @@ export default class ElementsSelector {
   }
 
   public isElVisible(el) {
-    let result = (!(el.offsetWidth === 0 && el.offsetHeight === 0));
+    let result = (el && !(el.offsetWidth === 0 && el.offsetHeight === 0));
     return result;
   }
 
