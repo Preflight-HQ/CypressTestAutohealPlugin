@@ -1,5 +1,5 @@
 import ElementFinder from './helpers/ElementFinder';
-import {escapeRegExp, first, sleepAsync} from './helpers/globalHelpers';
+import {escapeRegExp, sleepAsync} from './helpers/globalHelpers';
 import PreflightGlobalStore from './PreflightGlobalStore';
 import {dragAndDrop} from './helpers/commandHelpers';
 import OpenEmailCommand from './commands/OpenEmailCommand';
@@ -9,7 +9,7 @@ import GetElementCommand from './commands/GetElementCommand';
 import variablesProcessor from './helpers/variablesProcessor';
 import BaseRequestService from './APIs/baseRequestService';
 import 'cypress-file-upload';
-import SelectorsGenerator from './helpers/SelectorsGeenrator/SelectorsGenerator';
+import 'cypress-plugin-tab';
 
 beforeEach(async function() {
   PreflightGlobalStore.initialize();
