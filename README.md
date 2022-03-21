@@ -41,21 +41,21 @@ require('@preflight-hq/preflight-cypress-plugin')
         cy.initializeAutoheal('BdwKWXZ6IE4R');
         cy.visit('https://yourweb.app/#/login');
         cy.get('//h2[text()=" Sign in to your account "]/..//a', 2).click();
-        cy.get('//label[text()="First name"]/..//input', 3).type('{{name.firstName}}');
-        cy.get('//label[text()="Last name"]/..//input', 4).type('{{name.lastName}}');
-        cy.get('//label[text()="Email address"]/..//input', 5).type('{{generate.email}}');
-        cy.get('//label[text()="Password"]/..//input', 6).type('123456');
+        cy.get('#pf-lesson-signup-0', 3).type('{{name.firstName}}');
+        cy.get('#pf-lesson-signup-1', 4).type('{{name.lastName}}');
+        cy.get('[type="email"]', 5).type('{{generate.email}}');
+        cy.get('[type="password"]', 6).type('123456');
         cy.get('div.flex-col > button[id="pf-lesson-signup-4"]', 7).click();
         cy.openEmail('Verify your email');
         cy.get('a', {iframe: 'iframe#pf-email-iframe'}, 9).click();
         cy.closeEmail()
         cy.get('//h3[descendant::text()=" Email verified successfully! "]', 11).should('include.text', 'Email verified successfully!');
-        cy.get('//label[text()="Email address"]/..//input', 12).type('{{generate.email}}');
-        cy.get('//label[text()="Password"]/..//input', 13).type('123456');
+        cy.get('[type="email"]', 12).type('{{generate.email}}');
+        cy.get('[type="password"]', 13).type('123456');
         cy.get('//button[descendant::text()=" Sign in "]', 14).click();
-        cy.get('//h1[descendant::text()=" Good morning, Payton Bahringer"]', 15).should('include.text', 'Good morning, {{name.firstName[1]}} {{name.lastName[1]}}');
-        cy.get('span.hidden.text-sm.font-medium', 16).click();
-        cy.get('div.origin-top-right.absolute.rounded-md.shadow-lg.bg-white > button', 17).click();
+        cy.get('.flex>h1', 15).should('include.text', 'Good morning, {{name.firstName[1]}} {{name.lastName[1]}}');
+        cy.get('.max-w-xs', 16).click();
+        cy.get('.shadow-lg>button', 17).click();
         cy.autoheal();
       })
     })    
