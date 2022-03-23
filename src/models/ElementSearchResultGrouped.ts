@@ -1,6 +1,7 @@
 import {first} from "../helpers/globalHelpers";
 import ElementSearchResult from "./ElementSearchResult";
 import {ElementSearchMethod} from "../enums/ElementSearchMethod";
+import {SelectorsGenerator} from "../packages/preflight-selectors-generator/index";
 
 export default class ElementSearchResultGrouped {
   public score: number = 0;
@@ -14,8 +15,8 @@ export default class ElementSearchResultGrouped {
   }
 
   public get bestSelector(): string | null {
-    let selectors = this.searchResults.filter(g => g.searchMethod == ElementSearchMethod.SELECTORS && g.score > 0.7);
-    return first(selectors.sort((a, b) => b.score - a.score))?.selector;
+    let bestSelectors = SelectorsGenerator.findBestStringSelectors(this.searchResults.map(s => s.selector));
+    return first(bestSelectors)?.value;
   }
 
   public get contextAwarenessResult(): any | null {

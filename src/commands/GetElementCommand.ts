@@ -3,7 +3,8 @@ import loggerService from "../helpers/loggerService";
 import PreflightGlobalStore from "../PreflightGlobalStore";
 import reportService from "../helpers/reportService";
 import ElementsSelector from "../helpers/ElementsSelector";
-import SelectorsGenerator from "../helpers/SelectorsGeenrator/SelectorsGenerator";
+import { SelectorsGenerator } from "../packages/preflight-selectors-generator/index";
+import {first} from "../helpers/globalHelpers";
 
 export default class GetElementCommand {
   private readonly doc: Document;
@@ -71,8 +72,8 @@ export default class GetElementCommand {
       return;
     }
     if(!searchResult.selector) {
-      let generator = new SelectorsGenerator(this.doc);
-      searchResult.selector = generator.getBestSelector(searchResult.element)?.value;
+      let generator = new SelectorsGenerator();
+      searchResult.selector = first(generator.getBestSelectors(searchResult.element, 5))?.value;
     }
     loggerService.log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, this.options);
     reportService.pushData(this.mainSelector, this.actionId, searchResult);
