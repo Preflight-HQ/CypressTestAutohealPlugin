@@ -103,7 +103,7 @@ Cypress.Commands.add('autoheal', () => {
   // testFileArray.splice(dotIndex, 0, `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`);
   // let fixedFileName = testFileArray.join('');
 
-  
+
   if (PreflightGlobalStore.fixedFiles[testFile]) {
     PreflightGlobalStore.fixedFiles[testFile] = replaceSelectorsInTests(PreflightGlobalStore.fixedFiles[testFile], reportData);
     writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
