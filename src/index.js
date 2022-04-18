@@ -87,7 +87,7 @@ function log(name, message, el = null, options = null) {
 
 Cypress.Commands.add('autoheal', () => {
   let reportData = PreflightGlobalStore.state.testReport;
-  if(!reportData || reportData.length <= 0){
+  if (!reportData || reportData.length <= 0) {
     return;
   }
   let position = 1;
@@ -96,23 +96,26 @@ Cypress.Commands.add('autoheal', () => {
     position++;
     log('update request', out)
   });
-  let testFile =  Cypress.mocha.getRunner().test.invocationDetails.absoluteFile;
+  let testFile = Cypress.mocha.getRunner().test.invocationDetails.absoluteFile;
   let fixedFileName = testFile + `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`;
   // let dotIndex = testFile.lastIndexOf('.');
   // let testFileArray = testFile.split('');
   // testFileArray.splice(dotIndex, 0, `_fixed(${PreflightGlobalStore.testsStart.toISOString().slice(0, 19).replaceAll(':', '-')})`);
   // let fixedFileName = testFileArray.join('');
 
-
-  if(PreflightGlobalStore.fixedFiles[testFile]){
+  
+  if (PreflightGlobalStore.fixedFiles[testFile]) {
     PreflightGlobalStore.fixedFiles[testFile] = replaceSelectorsInTests(PreflightGlobalStore.fixedFiles[testFile], reportData);
-    cy.writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
+    writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
   } else {
     cy.readFile(testFile)
       .then(file => {
         PreflightGlobalStore.fixedFiles[testFile] = replaceSelectorsInTests(file, reportData);
-        cy.writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
-      });
+        writeFile(fixedFileName, PreflightGlobalStore.fixedFiles[testFile])
+          .catch(e => {
+            log('autoheal failed', `Cannot update file ${testFile}. Error: ${e.message}`)
+          })
+      })
   }
 });
 
@@ -196,6 +199,18 @@ BaseRequestService.RequestFunction = (method, url, data, responseType, contentTy
       }
     })
   });
+}
+
+function writeFile(fileName, contents){
+  log('writeFile', fileName);
+  return new Promise((resolve, reject)=> {
+    Cypress.backend('write:file', fileName, contents, {encoding: 'utf8', flag: 'w' })
+      .then(({ filePath, contents }) => {
+        resolve(filePath)
+      })
+      .catch(e => reject(e));
+  })
+
 }
 
 

@@ -1,25 +1,15 @@
 
 describe('test', () => {
-  it('Dashboard | YourWebApp', () => {
+  it('Login | YourWebApp', () => {
     cy.viewport(1440, 900);
-    cy.initializeAutoheal('ef4sspsl2YmK');
-    cy.visit('https://yourweb.app/#/signup');
-    cy.get('//label[text()="First name"]/..//input', 2).type('{{name.firstName}}');
-    cy.get('//label[text()="Last name"]/..//input', 3).type('{{name.lastName}}');
-    cy.get('//label[text()="Email address"]/..//input', 4).type('{{generate.email}}');
-    cy.get('//label[text()="Password"]/..//input', 5).type('123456');
-    cy.get('div.flex-col > button[id="pf-lesson-signup-4"]', 6).click();
-    cy.get('.py-8 > .flex-col', 7).should('include.text', 'We’ve sent an email to {{generate.email}}  Go and click a link there to log in.');
-    cy.openEmail('Verify your email');
-    cy.get('a', {iframe: 'iframe#pf-email-iframe'}, 9).click();
-    cy.closeEmail()
-    cy.get('//label[text()="Email address"]/..//input', 11).type('{{generate.email}}');
-    cy.get('//label[text()="Password"]/..//input', 12).type('123456');
-    cy.get('//button[descendant::text()=" Sign in "]', 13).click();
-    cy.get('.py-6 > .flex-1 > :nth-child(1) > :nth-child(2) > div.flex > .ml-3', 14).should('include.text', 'Good morning, {{name.firstName[1]}} {{name.lastName[1]}}');
+    cy.initializeAutoheal('puaecWLFgFw3');
+    cy.visit('https://yourweb.app/#/login');
+    cy.get('#pf-lesson-login-0', 2).click();
+    cy.get('#pf-lesson-login-1', 3).click();
+    cy.get('#pf-lesson-login-2', 4).should('include.text', 'Sign in');
     cy.autoheal();
   })
-})
+});
 
 // TODO better selectors generator
 // TODO Admin email
