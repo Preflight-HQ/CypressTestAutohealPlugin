@@ -8,6 +8,7 @@ export declare class ParsedElement {
     guid: string;
     element: Primitive;
     type: ElementType;
+    title: string | null;
     confidence: number;
     parent: ParsedElement | null;
     children: ParsedElement[];

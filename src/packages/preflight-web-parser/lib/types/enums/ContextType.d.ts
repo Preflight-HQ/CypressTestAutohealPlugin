@@ -22,5 +22,6 @@ export declare enum ContextType {
     SELECT_OPTION = "selectOption",
     ACCEPT_FILE_TYPES = "acceptFileTypes",
     LINK_HREF = "linkHref",
-    IS_RECURRING = "isRecurring"
+    IS_RECURRING = "isRecurring",
+    TITLE = "title"
 }

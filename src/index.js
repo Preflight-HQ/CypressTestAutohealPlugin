@@ -13,6 +13,9 @@ import 'cypress-plugin-tab';
 
 beforeEach(async function() {
   PreflightGlobalStore.initialize();
+  if(!PreflightGlobalStore.ApiKey){
+    PreflightGlobalStore.ApiKey = Cypress.env('PREFLIGHT_API_KEY') || process.env.PREFLIGHT_API_KEY
+  }
 });
 
 before(function() {
@@ -21,7 +24,6 @@ before(function() {
 });
 
 Cypress.Commands.add('initializeAutoheal', (autohealTestDataId) => {
-
   if(!PreflightGlobalStore.ApiKey){
     PreflightGlobalStore.ApiKey = Cypress.env('PREFLIGHT_API_KEY') || Cypress.PreflightApiKey || process.env.PREFLIGHT_API_KEY
   }
@@ -53,17 +55,17 @@ Cypress.Commands.overwrite('should', (originalFn, element, chainer, value) => {
   });
 });
 
-Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrActionId, possibleActionId = null) => {
-  let isOptionsActionId = typeof optionsOrActionId === 'number' || typeof optionsOrActionId === 'string';
-  let actionId = isOptionsActionId ? optionsOrActionId :  possibleActionId;
-  let getOptions = isOptionsActionId ? {} :  optionsOrActionId;
+Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrElementId, possibleElementId = null) => {
+  let isOptionsActionId = typeof optionsOrElementId === 'number' || typeof optionsOrElementId === 'string';
+  let elementId = isOptionsActionId ? optionsOrElementId :  possibleElementId;
+  let getOptions = isOptionsActionId ? {} :  optionsOrElementId;
   let testTitle = Cypress.mocha.getRunner().suite.ctx.test.title;
   let doc = cy.state('window').document;
 
   return new Cypress.Promise(async (resolve, reject) => {
     try {
       await sleepAsync(100);
-      let getCommand = new GetElementCommand(doc, selector, getOptions, actionId, testTitle);
+      let getCommand = new GetElementCommand(doc, selector, getOptions, elementId, testTitle);
       if(await getCommand.canBeHandledWithOriginalGet()) {
         return resolve(originalFn(selector, getOptions));
       }

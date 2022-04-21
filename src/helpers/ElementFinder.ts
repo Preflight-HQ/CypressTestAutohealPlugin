@@ -7,6 +7,11 @@ import ElementSearchResults from "../models/ElementSearchResults";
 import {ElementSearchMethod} from "../enums/ElementSearchMethod";
 import ElementSearchResult from "../models/ElementSearchResult";
 import autohealApiService from "../APIs/autohealApiService";
+import CyPomAutohealData from "../models/CyPomAutohealData";
+import TestActionData from "../models/TestActionData";
+// @ts-ignore
+import {ContextParserDataDB} from "./../packages/preflight-web-parser";
+import {isString} from "./globalHelpers";
 
 export default class ElementFinder {
   private doc: Document;
@@ -17,6 +22,14 @@ export default class ElementFinder {
   constructor(document: Document, parentIframeSelector: string){
     this.doc = document;
     this.elSelector = new ElementsSelector(this.doc, parentIframeSelector);
+  }
+
+  public static isCypressPomElementId(elementId: string){
+    return isString(elementId) && elementId.startsWith('pom');
+  }
+
+  public static getGuidCypressPomElGuid(elementId: string): string{
+    return this.isCypressPomElementId(elementId) ? elementId.replace(/^pom/, '') : elementId;
   }
 
   public async getTestAutohealData(testId: string, testTitle:string): Promise<any | null> {
@@ -30,7 +43,6 @@ export default class ElementFinder {
         return null;
       }
       let testAutohealData = JSON.parse(autohealResponse.dataJson);
-      PreflightGlobalStore.state.currentTestData = testAutohealData;
       return testAutohealData;
     } catch (e) {
       this.lastError = 'Autoheal request failed: ' + e.responseText
@@ -38,31 +50,60 @@ export default class ElementFinder {
     }
   }
 
-  public async findElementByAutohealData(testId: string, actionId: string, testTitle: string) {
+  public async findTestElementByAutohealData(testId: string, actionId: string, testTitle: string) {
+    if(!testId || !actionId){
+      this.lastError = 'Autoheal was not initialized correctly for action id: ' + actionId;
+      return null;
+    }
     let testAutohealData = await this.getTestAutohealData(testId, testTitle);
+    PreflightGlobalStore.state.currentTestData = testAutohealData;
     let actionAutohealData = testAutohealData?.actions.find(a => a.guid == actionId)?.data;
     if(!testAutohealData){
-      return actionAutohealData;
+      return null;
     }
 
-    let elFinderSearchData = new ElementFinderSearchData(actionAutohealData);
+    let testActionData = new TestActionData(actionAutohealData);
+    let elFinderSearchData = new ElementFinderSearchData(testActionData.mainSelectors, testActionData.possibleSelectors, testActionData.expectedText);
     let elementSelectorsSearch = new ElementSelectorsSearchModule(this.elSelector);
+    let parserData = testActionData.parserData ? await ContextParserSearchModule.getParserDataFromUrl(testActionData.parserData) : null;
+
     let searchResults =  await elementSelectorsSearch.search(elFinderSearchData);
+
     if(searchResults.isReliableResultFound){
-      return await this.getSearchResult(searchResults, actionAutohealData);
+      return await this.getSearchResult(searchResults, parserData);
     }
-    searchResults = await this.findElWithContextParser(actionAutohealData, searchResults);
-    return await this.getSearchResult(searchResults, actionAutohealData);
+    searchResults = await this.findElWithContextParser(parserData, searchResults);
+    return await this.getSearchResult(searchResults, parserData);
   }
 
-  private async findElWithContextParser(actionAutohealData: any[], previousSearchResults: ElementSearchResults) {
-    let parserDataUrl = actionAutohealData.find(ads => ads.type == 'contextparserdata')?.value;
-    if(!parserDataUrl){
+  public async findPomElementByAutohealData(elementId: string, testTitle: string) {
+    elementId = ElementFinder.getGuidCypressPomElGuid(elementId);
+    let autohealDataResponse = await this.getTestAutohealData(elementId, testTitle);
+    if(!autohealDataResponse){
+      return null;
+    }
+    debugger
+    let cyPomAutohealData = new CyPomAutohealData(autohealDataResponse.selectors, autohealDataResponse.parsedData);
+    let parserData = cyPomAutohealData.parserData;
+    let elFinderSearchData = new ElementFinderSearchData(cyPomAutohealData.selectors);
+    let elementSelectorsSearch = new ElementSelectorsSearchModule(this.elSelector);
+
+    let searchResults =  await elementSelectorsSearch.search(elFinderSearchData);
+
+    if(searchResults.isReliableResultFound && false){
+      return await this.getSearchResult(searchResults, parserData);
+    }
+    searchResults = await this.findElWithContextParser(parserData, searchResults);
+    return await this.getSearchResult(searchResults, parserData);
+  }
+
+  private async findElWithContextParser(elementParserData: ContextParserDataDB, previousSearchResults: ElementSearchResults) {
+    if(!elementParserData){
       return null;
     }
     let parserSearch = new ContextParserSearchModule(this.doc);
 
-    let parserSearchResult = await parserSearch.findElement(parserDataUrl);
+    let parserSearchResult = await parserSearch.findElement(elementParserData);
     if(!parserSearchResult){
       return previousSearchResults;
     }
@@ -72,7 +113,7 @@ export default class ElementFinder {
     return previousSearchResults;
   }
 
-  private async getSearchResult(searchResults: ElementSearchResults, actionData){
+  private async getSearchResult(searchResults: ElementSearchResults, parserData: ContextParserDataDB | null){
     let bestResult = searchResults.bestResult;
     if(!bestResult || bestResult.score < 1){
       return 0;
@@ -82,8 +123,7 @@ export default class ElementFinder {
       elementSimplePath = bestResult.contextAwarenessResult.foundElementLocation;
     } else {
       let parserSearch = new ContextParserSearchModule(this.doc);
-      let parserDataUrl = actionData.find(ads => ads.type == 'contextparserdata')?.value;
-      elementSimplePath = parserSearch.getSimpleMessage(await parserSearch.getSimplePathFromActionData(parserDataUrl));
+      elementSimplePath = parserSearch.getSimpleMessage(await parserSearch.getSimplePathFromParserData(parserData));
     }
     let visibleElement = this.elSelector.getVisibleElement([bestResult.element], 3)
     return {

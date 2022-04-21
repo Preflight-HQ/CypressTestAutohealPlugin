@@ -24,7 +24,8 @@ export default class WebPageParser {
     readonly lexicalAnalysis_StructuresUpDownParsers: BaseUpDownParser[];
     readonly syntacticAnalysisParsers: BaseUpDownParser[];
     private preParsedTokens;
-    getParsedDataForElement(el: HTMLElement, refreshParsedData?: boolean, discardPreviouslyParsedElements?: boolean, parseOnlyTargetPath?: boolean): ParserElementResult;
+    getParsedDataForElement(el: HTMLElement, refreshParsedData?: boolean, discardPreviouslyParsedElements?: boolean, parseOnlyTargetPath?: boolean): ParserElementResult | null;
+    getParserDataOnlyForElement(targetGuid: string): ParserElementResult | null;
     private initializeBeforeParse;
     stop(): void;
     parseDOM(discardPreviouslyParsedElements: boolean, onlyForTarget?: Primitive | null): ParsedElement;

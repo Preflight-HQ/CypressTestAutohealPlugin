@@ -1,13 +1,13 @@
 // @ts-ignore
 import * as JSZip from "jszip";
 // @ts-ignore
-import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig} from "./packages/preflight-web-parser";
+import {ElementFinder, ParsedTargetTextPathGenerator, WebPageParser, WebPageParserConfig, ContextParserDataDB} from "./packages/preflight-web-parser";
 import BaseRequestService from "./APIs/baseRequestService";
 
 export default class ContextParserSearchModule {
   private document = null;
   private webParser:WebPageParser;
-  private downloadedImputs = [];
+  private downloadedInputs = [];
 
   constructor(doc) {
     this.document = doc;
@@ -20,13 +20,10 @@ export default class ContextParserSearchModule {
     this.webParser = WebPageParser.BuildFromConfig(config);
   }
 
-  async findElement(dataUrl){
-    let originalParsedData = await this.getUncompressedParserData(dataUrl);    if(!originalParsedData){
-      return null;
-    }
-    let elementFinder = new ElementFinder(originalParsedData.parsedData);
+  async findElement(elementParserData){
+    let elementFinder = new ElementFinder(elementParserData.data);
     this.webParser.parseDOM(false);
-    let foundElementData = await elementFinder.findByPseudoSelector(this.webParser.parsedTreeRoot, originalParsedData.target);
+    let foundElementData = await elementFinder.findByPseudoSelector(this.webParser.parsedTreeRoot, elementParserData.target);
     let result = null;
     if(foundElementData){
       result = {
@@ -43,15 +40,21 @@ export default class ContextParserSearchModule {
     return result
   }
 
+  public static async getParserDataFromUrl(url): Promise<ContextParserDataDB | null> {
+    return await ContextParserSearchModule.uncompressParserData(url);
+  }
+
   async getUncompressedParserData(dataUrl) {
-    if(this.downloadedImputs[dataUrl]){
-      return this.downloadedImputs[dataUrl];
+    if(this.downloadedInputs[dataUrl]){
+      return this.downloadedInputs[dataUrl];
     }
-    let result = {
-      parserVersion: null,
-      target: null,
-      parsedData: null
-    }
+    let result = ContextParserSearchModule.uncompressParserData(dataUrl);
+    this.downloadedInputs[dataUrl] = result;
+    return result;
+  }
+
+  public static async uncompressParserData(dataUrl): Promise<ContextParserDataDB | null> {
+    let result = new ContextParserDataDB(null, null, null);
     try {
       if (typeof (dataUrl) === 'string' && dataUrl.startsWith('http')) {
         let requestService = new BaseRequestService();
@@ -66,26 +69,24 @@ export default class ContextParserSearchModule {
       if(typeof parserStepData.data[0] === 'number'){
         return null // invalid format
       } else if(parserStepData.data.data && parserStepData.data.data.length > 0 && typeof parserStepData.data.data[0] === 'number') {
-        result.parsedData = null
+        result.data = null
       } else {
-        result.parsedData = parserStepData.data;
+        result.data = parserStepData.data;
       }
       result.target = parserStepData.target
       result.parserVersion = parserStepData.parserVersion
-      this.downloadedImputs[dataUrl] = result;
       return result;
     } catch(e){
       return null;
     }
   }
 
-  async getSimplePathFromActionData(actionDataValue) {
-    let originalParsedData = await this.getUncompressedParserData(actionDataValue);
-    if(!originalParsedData){
+  async getSimplePathFromParserData(parserData: ContextParserDataDB | null) {
+    if(!parserData){
       return null;
     }
-    let pathGenerator = new ParsedTargetTextPathGenerator(originalParsedData.parsedData);
-    return pathGenerator.getSimplePathFromPseudoSelector(originalParsedData.target)
+    let pathGenerator = new ParsedTargetTextPathGenerator(parserData.data);
+    return pathGenerator.getSimplePathFromPseudoSelector(parserData.target)
   }
 
   getSimpleMessage(simplePath) {

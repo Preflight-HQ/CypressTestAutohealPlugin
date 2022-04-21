@@ -9,3 +9,6 @@ export declare function dotProduct(xs: number[], ys: number[]): number | undefin
 export declare function zipWith(f: ((a: number, b: number) => number), xs: number[], ys: number[]): number[];
 export declare function groupBy(xs: any[], key: string): any;
 export declare function occurencesCount(arr: any[]): any;
+export declare function toCamelCase(str: string | null): string | null;
+export declare function toPascalCase(str: string | null): string | null;
+export declare function firtLetterCapital(str: string | null): string | undefined;

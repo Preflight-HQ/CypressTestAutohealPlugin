@@ -11,14 +11,14 @@ export default class GetElementCommand {
   private readonly mainSelector: string;
   private readonly options: any;
   private readonly testTitle: string;
-  private readonly actionId: string;
+  private readonly elementId: string;
   private elSelector: ElementsSelector;
   private elFinder: ElementFinder;
   private _isElMainSelOnPage: boolean | undefined = undefined;
 
-  constructor(document: Document, selector, options, actionId, testTitle) {
+  constructor(document: Document, selector, options, elementId, testTitle) {
     this.doc = document;
-    this.actionId = actionId;
+    this.elementId = elementId;
     this.mainSelector = selector;
     this.options = options;
     this.testTitle = testTitle;
@@ -53,7 +53,6 @@ export default class GetElementCommand {
   }
 
   public async process(): Promise<Element> {
-
     // if we can resolve element without autoheal
     if(await this.isElMainSelOnPage()){
       let element = this.elSelector.getFirstElement(this.mainSelector);
@@ -61,12 +60,17 @@ export default class GetElementCommand {
       return element;
     }
 
-    if(!this.actionId || !PreflightGlobalStore.state.currentTestId){
+    if(!this.elementId){
       this.elNotFoundException();
     }
 
     loggerService.log('log',`Element not found with existing selector "${this.mainSelector}". Trying to apply test autoheal data.`, null, this.options)
-    let searchResult = await this.elFinder.findElementByAutohealData(PreflightGlobalStore.state.currentTestId, this.actionId, this.testTitle);
+    let searchResult = null;
+    if(ElementFinder.isCypressPomElementId(this.elementId)){
+      searchResult = await this.elFinder.findPomElementByAutohealData(this.elementId, this.testTitle);
+    } else {
+      searchResult = await this.elFinder.findTestElementByAutohealData(PreflightGlobalStore.state.currentTestId, this.elementId, this.testTitle);
+    }
     if(!searchResult){
       this.elNotFoundException(this.elFinder.lastError);
       return;
@@ -76,7 +80,7 @@ export default class GetElementCommand {
       searchResult.selector = first(generator.getBestSelectors(searchResult.element, 5))?.value;
     }
     loggerService.log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, this.options);
-    reportService.pushData(this.mainSelector, this.actionId, searchResult);
+    reportService.pushData(this.mainSelector, this.elementId, searchResult);
     return searchResult.element as Element;
   }
 

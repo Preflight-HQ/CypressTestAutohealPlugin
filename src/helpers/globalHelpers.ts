@@ -31,3 +31,6 @@ export const escapeRegExp = (string) => {
 export const base64ToString = (input) => {
   return decodeURIComponent(atob( input ))
 }
+export const isString = (value) => {
+  return typeof value === 'string' || value instanceof String;
+}

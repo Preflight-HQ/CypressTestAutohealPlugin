@@ -1,6 +1,6 @@
 {
   "name": "preflight-web-parser",
-  "version": "1.0.46",
+  "version": "1.0.58",
   "description": "",
   "main": "index.js",
   "types": "lib/webParserPackage/index.d.ts",

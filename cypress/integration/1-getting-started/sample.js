@@ -1,15 +1,27 @@
+import YourWebAppLogin from './POMs/yourWebApp_login';
 
 describe('test', () => {
   it('Login | YourWebApp', () => {
     cy.viewport(1440, 900);
-    cy.initializeAutoheal('puaecWLFgFw3');
-    cy.visit('https://yourweb.app/#/login');
-    cy.get('#pf-lesson-login-0', 2).click();
-    cy.get('#pf-lesson-login-1', 3).click();
-    cy.get('#pf-lesson-login-2', 4).should('include.text', 'Sign in');
-    cy.autoheal();
+    let webApp = new YourWebAppLogin();
+    webApp.visit();
+    webApp.enterEmailAddress('test@test.com');
+    webApp.enterPassword('Test123');
+    webApp.clickSignIn();
   })
 });
+//
+// describe('test', () => {
+//   it('Login | YourWebApp', () => {
+//     cy.viewport(1440, 900);
+//     cy.initializeAutoheal('puaecWLFgFw3');
+//     cy.visit('https://yourweb.app/#/login');
+//     cy.get('#pon-login-0', 2).click();
+//     cy.get('#pf-lesson-login-1', 3).click();
+//     cy.get('#pf-lesson-login-2', 4).should('include.text', 'Sign in');
+//     cy.autoheal();
+//   })
+// });
 
 // TODO better selectors generator
 // TODO Admin email

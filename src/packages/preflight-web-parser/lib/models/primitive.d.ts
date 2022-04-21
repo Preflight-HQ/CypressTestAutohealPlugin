@@ -5,6 +5,7 @@ export declare class Primitive {
     readonly Element: Node;
     isTagNode: boolean;
     constructor(element: Node);
+    get title(): string | null;
     get href(): string | null;
     get hrefWithoutHost(): string | null;
     get HtmlElement(): HTMLElement;
@@ -80,6 +81,7 @@ export declare class Primitive {
     get isHeadingType(): boolean;
     get cursor(): CursorType;
     get display(): string;
+    get isPositionFixed(): boolean;
     get isBlock(): boolean;
     querySelector(selector: string): Primitive | null;
     querySelectorAll(selector: string): Primitive[] | null;
