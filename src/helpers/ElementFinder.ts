@@ -82,7 +82,6 @@ export default class ElementFinder {
     if(!autohealDataResponse){
       return null;
     }
-    debugger
     let cyPomAutohealData = new CyPomAutohealData(autohealDataResponse.selectors, autohealDataResponse.parsedData);
     let parserData = cyPomAutohealData.parserData;
     let elFinderSearchData = new ElementFinderSearchData(cyPomAutohealData.selectors);

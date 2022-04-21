@@ -9,11 +9,3 @@ export default class CyPomAutohealData {
     this.parserData = parserData;
   }
 }
-
-
-/*
-TODO otestovat autoheal pri behu testu
-TODO ukladat stazene POM autoheal elementy na pozdejsi pouziti
-TODO POM autoheal codu, prepisovani souboru
-
- */
