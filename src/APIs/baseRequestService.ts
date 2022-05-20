@@ -4,7 +4,7 @@ import authService from "./authService";
 export default class BaseRequestService {
   baseUrl = '';
   public authHeaders: any = {};
-  public static RequestFunction: (method, url, data, responseType, contentType, authorize) => any = null
+  public static RequestFunction: (method, url, data, responseType, contentType, authorize) => any = BaseRequestService.xhrRequest
 
   constructor(baseUrl = ''){
     this.baseUrl = baseUrl;
@@ -23,7 +23,8 @@ export default class BaseRequestService {
             accessToken = await authService.getAccessToken(this.apiKey);
           }
           let result = await BaseRequestService.RequestFunction(method, this.baseUrl + endpoint, data, responseType, contentType, accessToken);
-          resolve(typeof result.body !== 'string' ? JSON.stringify(result.body) : result.body);
+          let response = result.body || result.response;
+          resolve(typeof response !== 'string' ? JSON.stringify(response) : response);
         } catch (e) {
           reject({
             status: e.status,
@@ -36,32 +37,29 @@ export default class BaseRequestService {
 
   }
 
-  xhrRequest(method, endpoint, data = undefined, responseType = null, contentType="application/json;charset=UTF-8", authorize: boolean = false){
-    return new Promise(async (resolve, reject) => {
+  public static xhrRequest(method, url, data, responseType, contentType, accessToken) {
+    return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
-      let that = this;
       if(responseType){
         xhr.responseType = responseType;
       }
-      xhr.open(method, this.baseUrl + endpoint);
+      xhr.open(method, url);
       if(contentType) {
         xhr.setRequestHeader("Content-Type", contentType);
       }
-      if(authorize) {
-        let accessToken = await authService.getAccessToken(this.apiKey);
+      if(accessToken) {
         xhr.setRequestHeader('Authorization', 'bearer ' + accessToken);
       }
 
       xhr.onload = function () {
         if (this.status >= 200 && this.status < 300) {
-          resolve(xhr.response);
+          resolve(xhr);
         } else {
-
-          reject(that.buildRejectResponse(this.status, xhr));
+          reject(BaseRequestService.buildRejectResponse(this.status, xhr));
         }
       };
       xhr.onerror = function () {
-        reject(that.buildRejectResponse(this.status, xhr));
+        reject(BaseRequestService.buildRejectResponse(this.status, xhr));
       };
       xhr.send(data);
     });
@@ -80,7 +78,7 @@ export default class BaseRequestService {
     }
   }
 
-  private buildRejectResponse(status, xhr){
+  private static buildRejectResponse(status, xhr){
     let responseText = null;
     let statusText = null;
     try {

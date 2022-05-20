@@ -1,13 +1,17 @@
-export default class checkoutExampleBootstrap {
+export default class CheckoutExampleBootstrapPOM {
+
+  visit() {
+    cy.visit('https://getbootstrap.com/docs/4.5/examples/checkout/')
+  }
+
   /**
    "Your cart 3" Box  > Form > "Promo code" Input
    placeholder: Promo code | inputType: text | tag: input | class: form-control
    */
-  enterPromoCode(promoCode) {
-    cy.get('.card>div>[type="text"]', 'pomAE6JDWkuj1dO')
+  typePromoCode(PromoCode) {
+    return cy.get('//*[@placeholder="Promo code"]', 'pom5674cf52-5b98-45b1-9883-c6945e9cdb80')
       .clear()
-      .type(promoCode)
-    return this
+      .type(PromoCode);
   }
 
   /**
@@ -15,86 +19,78 @@ export default class checkoutExampleBootstrap {
    purpose: submit | tag: button | class: btn-secondary, btn
    */
   clickRedeem() {
-    cy.get('//form/div/div/*[normalize-space(.)="Redeem"]', 'pomPHuwAqgeg3xb')
-      .click()
-    return this
+    return cy.get('div>.btn', 'poma4d6f3c0-67b4-4d4e-b523-c858b407e6aa')
+      .click();
   }
 
   /**
    "Billing address" Box  > Form > "First name" Input
    purpose: firstName | id: firstName | inputType: text | tag: input | class: form-control
    */
-  enterFirstName(firstName) {
-    cy.get('#firstName', 'pomoMLGQj7jwTA7')
+  typeFirstName(FirstName) {
+    return cy.get('#firstName', 'pom26039e58-88f6-4f3f-819f-73f904d8abd0')
       .clear()
-      .type(firstName)
-    return this
+      .type(FirstName);
   }
 
   /**
    "Billing address" Box  > Form > "Last name" Input
    purpose: lastName | id: lastName | inputType: text | tag: input | class: form-control
    */
-  enterLastName(lastName) {
-    cy.get('#lastName', 'pomNgYlrHQIhdlM')
+  typeLastName(LastName) {
+    return cy.get('#lastName', 'pomde40ac11-0197-4e1c-8bc2-621a7693267d')
       .clear()
-      .type(lastName)
-    return this
+      .type(LastName);
   }
 
   /**
    "Billing address" Box  > Form > "Username" Input
    placeholder: Username | id: username | inputType: text | tag: input | class: form-control
    */
-  enterUsername(username) {
-    cy.get('#username', 'pomBXyyIIrzLns4')
+  typeUsername(Username) {
+    return cy.get('#username', 'pomaa43cf99-39e8-4a7d-b550-71f6a70d143c')
       .clear()
-      .type(username)
-    return this
+      .type(Username);
   }
 
   /**
    "Billing address" Box  > Form > "Email (Optional)" Input
    purpose: email | placeholder: you@example.com | id: email | inputType: email | tag: input | class: form-control
    */
-  enterEmailOptional(emailOptional) {
-    cy.get('#email', 'pomz4VqEQk3P1Np')
+  typeEmailOptional(EmailOptional) {
+    return cy.get('#email', 'pom82ae16cd-1f5a-4588-9fe7-73ffb8e4442c')
       .clear()
-      .type(emailOptional)
-    return this
+      .type(EmailOptional);
   }
 
   /**
    "Billing address" Box  > Form > "Address" Input
    purpose: address | placeholder: 1234 Main St | id: address | inputType: text | tag: input | class: form-control
    */
-  enterAddress(address) {
-    cy.get('#dd', 'pomfdYNSvoo2vnp')
+  typeAddress(Address) {
+    return cy.get('#address', 'pom4f8e2a30-a2ac-47ab-8f06-5cf426ed1062')
       .clear()
-      .type(address)
-    return this
+      .type(Address);
   }
 
   /**
    "Billing address" Box  > Form > "Address 2 (Optional)" Input
    purpose: address | placeholder: Apartment or suite | id: address2 | inputType: text | tag: input | class: form-control
    */
-  enterAddress2Optional(address2Optional) {
-    cy.get('#address2', 'pomM8PnQLtgvtxi')
+  typeAddress2Optional(Address2Optional) {
+    return cy.get('#address2', 'pom25fad0f8-fdd7-4c86-86da-a588841bd8a7')
       .clear()
-      .type(address2Optional)
-    return this
+      .type(Address2Optional);
   }
 
   /**
    "Billing address" Box  > Form > "Zip" Input
    purpose: zip | id: zip | inputType: text | tag: input | class: form-control
    */
-  enterZip(zip) {
-    cy.get('#zip', 'pommYvHp3axZmGT')
+  typeZip(Zip) {
+    return cy.get('#zip', 'pom18b7c2c1-0ca3-4cc1-a3ef-d3595ccfdd26')
       .clear()
-      .type(zip)
-    return this
+      .type(Zip);
   }
 
   /**
@@ -102,9 +98,8 @@ export default class checkoutExampleBootstrap {
    id: same-address | tag: input
    */
   clickCheckboxOption() {
-    cy.get('#same-address', 'pomYDKcW7nhQGOR')
-      .click()
-    return this
+    return cy.get('#same-address', 'pom9b308946-403f-4d03-85fc-d1c5420d88ef')
+      .click();
   }
 
   /**
@@ -112,19 +107,17 @@ export default class checkoutExampleBootstrap {
    id: save-info | tag: input
    */
   clickShippingAddressIsTheSameAsMyBillingAddressOption() {
-    cy.get('#save-info', 'pomjIhCZeNmJ7An')
-      .click()
-    return this
+    return cy.get('#save-info', 'pom2ceeb2a0-2dd7-49d5-acc8-96ee9cfbd10b')
+      .click();
   }
 
   /**
    "Billing address" Box  > Form > RadioButton
    id: credit | tag: input
    */
-  clickRadiobuttonOption() {
-    cy.get('//*[normalize-space(.)="Credit card"]/ancestor-or-self::div/input', 'pomWDTX9ULxhcXp')
-      .click()
-    return this
+  clickRadioButtonOption() {
+    return cy.get('#credit', 'pomdc68091a-cdef-4861-894f-ba71ffb15f8a')
+      .click();
   }
 
   /**
@@ -132,9 +125,8 @@ export default class checkoutExampleBootstrap {
    id: debit | tag: input
    */
   clickCreditCardOption() {
-    cy.get('//*[normalize-space(.)="Debit card"]/ancestor-or-self::div/input', 'pom2fCf1GeFiZ3M')
-      .click()
-    return this
+    return cy.get('#debit', 'pom48cd87b9-2cf0-49ae-a196-907320f46388')
+      .click();
   }
 
   /**
@@ -142,53 +134,48 @@ export default class checkoutExampleBootstrap {
    id: paypal | tag: input
    */
   clickDebitCardOption() {
-    cy.get('//*[normalize-space(.)="PayPal"]/ancestor-or-self::div/input', 'pomdbYDbztshnN6')
-      .click()
-    return this
+    return cy.get('#paypal', 'pom91cfd8e3-8290-4af2-b073-5ace63801ec3')
+      .click();
   }
 
   /**
    "Billing address" Box  > Form > "Name on card" Input
    id: cc-name | inputType: text | tag: input | class: form-control
    */
-  enterNameOnCard(nameOnCard) {
-    cy.get('#cc-name', 'pom7NaZrttwoJ61')
+  typeNameOnCard(NameOnCard) {
+    return cy.get('#cc-name', 'pombf68534b-6993-446c-b906-4bd911681db8')
       .clear()
-      .type(nameOnCard)
-    return this
+      .type(NameOnCard);
   }
 
   /**
    "Billing address" Box  > Form > "Credit card number" Input
    id: cc-number | inputType: text | tag: input | class: form-control
    */
-  enterCreditCardNumber(creditCardNumber) {
-    cy.get('#cc-number', 'pomtx7GLhGWnkAX')
+  typeCreditCardNumber(CreditCardNumber) {
+    return cy.get('#cc-number', 'pombe70f266-6640-4dc4-9f52-bddd6d676018')
       .clear()
-      .type(creditCardNumber)
-    return this
+      .type(CreditCardNumber);
   }
 
   /**
    "Billing address" Box  > Form > "Expiration" Input
    id: cc-expiration | inputType: text | tag: input | class: form-control
    */
-  enterExpiration(expiration) {
-    cy.get('#cc-expiration', 'pomyPJptUUwz8qq')
+  typeExpiration(Expiration) {
+    return cy.get('#cc-expiration', 'pom6d3eb5ac-9287-4872-b876-e8a37c492782')
       .clear()
-      .type(expiration)
-    return this
+      .type(Expiration);
   }
 
   /**
    "Billing address" Box  > Form > "CVV" Input
    id: cc-cvv | inputType: text | tag: input | class: form-control
    */
-  enterCvv(cvv) {
-    cy.get('#cc-cvv', 'pomjTrY9btzT5Su')
+  typeCVV(CVV) {
+    return cy.get('#cc-cvv', 'pomed1062ef-245b-4b72-9b85-95a9a07adab8')
       .clear()
-      .type(cvv)
-    return this
+      .type(CVV);
   }
 
   /**
@@ -196,9 +183,13 @@ export default class checkoutExampleBootstrap {
    purpose: submit | tag: button | class: btn-block, btn, btn-primary, btn-lg
    */
   clickContinueToCheckout() {
-    cy.get('//*[normalize-space(.)="Continue to checkout"]', 'pomYGSf9Ii3Yv2U')
-      .click()
-    return this
+    return cy.get('.btn-lg', 'pom5c49a624-7d85-4b3b-9891-3a3049dd07bf')
+      .click();
+  }
+
+
+  getLabel() {
+    return cy.get('[for="lastName"]', 'pom65c85b8c-7d70-4f7a-8f0e-90be27a990b5')
   }
 
 }

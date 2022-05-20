@@ -1,13 +1,19 @@
-import YourWebAppLogin from './POMs/yourWebApp_login';
+import TestPage from './POMs/getBootstrap';
+import LoginYourwebappPOM from './POMs/yourWebApp_login';
 
 describe('test', () => {
   it('Login | YourWebApp', () => {
     cy.viewport(1440, 900);
-    let webApp = new YourWebAppLogin();
-    webApp.visit();
-    webApp.enterEmailAddress('test@test.com');
-    webApp.enterPassword('Test123');
-    webApp.clickSignIn();
+    // cy.visit('https://data.amplitude.com/preflight-hq/PreFlight/events/main/latest/NewName').wait(5000)
+    // cy.get('.TextInput_input__3x5XP').type('preflight-hq');
+    // cy.get('._1roama0._1roama3._1roama6').click().wait(1000);
+    // cy.get('[name="email"]').type('michal@preflight.com');
+    // cy.get('[name="password"]').type('Eltodo4136');
+    // cy.get('.Box_justification-center__prodz>button>span').click();
+    //cy.wait(60000);
+    let loginPage = new TestPage();
+    loginPage.visit();
+    loginPage.typePromoCode('sfd').clear();
   })
 });
 //
@@ -16,7 +22,12 @@ describe('test', () => {
 //     cy.viewport(1440, 900);
 //     cy.initializeAutoheal('puaecWLFgFw3');
 //     cy.visit('https://yourweb.app/#/login');
-//     cy.get('#pon-login-0', 2).click();
+//
+//     cy.get('#pf-lesson-login-0', 2).parent().then(e => {
+//       debugger;
+//       cy.wrap(e).children().type('tetet')
+//     });
+//     cy.get('#pf-lesson-login-0', 2).click();
 //     cy.get('#pf-lesson-login-1', 3).click();
 //     cy.get('#pf-lesson-login-2', 4).should('include.text', 'Sign in');
 //     cy.autoheal();

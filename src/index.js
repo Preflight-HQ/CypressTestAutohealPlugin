@@ -5,9 +5,8 @@ import {dragAndDrop} from './helpers/commandHelpers';
 import OpenEmailCommand from './commands/OpenEmailCommand';
 import CloseEmailCommand from './commands/CloseEmailCommand';
 import loggerService from './helpers/loggerService';
-import GetElementCommand from './commands/GetElementCommand';
-import variablesProcessor from './helpers/variablesProcessor';
 import BaseRequestService from './APIs/baseRequestService';
+import testAutohealService from './TestAutohealService';
 import 'cypress-file-upload';
 import 'cypress-plugin-tab';
 
@@ -36,7 +35,7 @@ Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
       if(!element){
         reject('Element cannot be null.');
       }
-      value = await variablesProcessor.replaceVariables(value);
+      value = await testAutohealService.replaceVariables(value);
       resolve(originalFn(element, value, options))
     } catch(e){
       reject(e.message);
@@ -47,7 +46,7 @@ Cypress.Commands.overwrite('type', (originalFn, element, value, options) => {
 Cypress.Commands.overwrite('should', (originalFn, element, chainer, value) => {
   return new Cypress.Promise(async (resolve, reject) => {
     try {
-      value = await variablesProcessor.replaceVariables(value);
+      value = await testAutohealService.replaceVariables(value);
       resolve(originalFn(element, chainer, value))
     } catch(e){
       reject(e.message);
@@ -64,16 +63,8 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrElementId, pos
 
   return new Cypress.Promise(async (resolve, reject) => {
     try {
-      await sleepAsync(100);
-      let getCommand = new GetElementCommand(doc, selector, getOptions, elementId, testTitle);
-      if(await getCommand.canBeHandledWithOriginalGet()) {
-        return resolve(originalFn(selector, getOptions));
-      }
-      let element = await getCommand.process();
-      if(!element){
-        reject('Element not found.');
-      }
-      resolve(element);
+      let result = await testAutohealService.findElement(doc, selector, elementId, getOptions, testTitle, originalFn)
+      resolve(result);
     } catch (e) {
       reject(e.message);
     }

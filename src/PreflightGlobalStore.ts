@@ -3,9 +3,9 @@ export default class PreflightGlobalStore {
   constructor() {
     throw new Error('cannot instantiate using a static class');
   }
-  public static apiUrl:string = 'https://api.preflight.com/v1/';
-  public static authServerUrl:string = 'https://auth.preflight.com';
-  public static emailDomain:string = 'test.preflight.com';
+  public static apiUrl:string = 'https://apidev.preflightdev.com/v1/';
+  public static authServerUrl:string = 'https://authdev.preflightdev.com';
+  public static emailDomain:string = 'test-dev.preflight.com';
   public static adminEmailDomain:string = 'testadmin.preflight.com';
   public static ApiKey:string|null;
   public static fixedFiles: string[] = [];

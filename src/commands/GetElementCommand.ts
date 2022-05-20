@@ -45,7 +45,7 @@ export default class GetElementCommand {
     return await this.elSelector.isElOnPage(this.mainSelector, 4000)
   }
 
-  public async canBeHandledWithOriginalGet() {
+  public async doesElementExistOnPage() {
     if(this.elSelector.isXpathSelector(this.mainSelector) || this.parentIframeSelector){
       return false;
     }
