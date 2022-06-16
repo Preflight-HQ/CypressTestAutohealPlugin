@@ -4,6 +4,7 @@ import GetElementCommand from "./commands/GetElementCommand";
 import variablesProcessor from "./helpers/variablesProcessor";
 import OpenEmailCommand from "./commands/OpenEmailCommand";
 import CloseEmailCommand from "./commands/CloseEmailCommand";
+import GetElementCommandResult from "./models/GetElementCommandResult";
 
 class TestAutohealService {
   initialize(preflightApiKey: string) {
@@ -13,11 +14,12 @@ class TestAutohealService {
     }
   }
 
-  async findElement(doc: Document, selector: string, elementId: string, getOptions: any, testTitle: string, getElFunction: (string, any) => HTMLElement){
+  async findElement(doc: Document, selector: string, elementId: string, getOptions: any, testTitle: string, getElFunction: (string, any) => HTMLElement): Promise<GetElementCommandResult>{
     await sleepAsync(100);
     let getCommand = new GetElementCommand(doc, selector, getOptions, elementId, testTitle);
     if(await getCommand.doesElementExistOnPage()) {
-      return getElFunction(selector, getOptions);
+      let el = getElFunction(selector, getOptions);
+      return new GetElementCommandResult(el, selector);
     }
     let element = await getCommand.process();
     if(!element){

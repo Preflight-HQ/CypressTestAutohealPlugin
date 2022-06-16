@@ -24,6 +24,10 @@ export default class BaseRequestService {
           }
           let result = await BaseRequestService.RequestFunction(method, this.baseUrl + endpoint, data, responseType, contentType, accessToken);
           let response = result.body || result.response;
+          if(responseType == 'blob'){
+            resolve(response);
+            return;
+          }
           resolve(typeof response !== 'string' ? JSON.stringify(response) : response);
         } catch (e) {
           reject({

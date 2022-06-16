@@ -5,6 +5,7 @@ import reportService from "../helpers/reportService";
 import ElementsSelector from "../helpers/ElementsSelector";
 import { SelectorsGenerator } from "../packages/preflight-selectors-generator/index";
 import {first} from "../helpers/globalHelpers";
+import GetElementCommandResult from "../models/GetElementCommandResult";
 
 export default class GetElementCommand {
   private readonly doc: Document;
@@ -52,12 +53,12 @@ export default class GetElementCommand {
     return await this.isElMainSelOnPage();
   }
 
-  public async process(): Promise<Element> {
+  public async process(): Promise<GetElementCommandResult> {
     // if we can resolve element without autoheal
     if(await this.isElMainSelOnPage()){
       let element = this.elSelector.getFirstElement(this.mainSelector);
       loggerService.log(this.isMainSelectorXPath ? 'get-xPath' : 'get', this.getLogSelector(this.mainSelector), element, this.options);
-      return element;
+      return new GetElementCommandResult(element, this.mainSelector);
     }
 
     if(!this.elementId){
@@ -73,7 +74,7 @@ export default class GetElementCommand {
     }
     if(!searchResult){
       this.elNotFoundException(this.elFinder.lastError);
-      return;
+      return null;
     }
     if(!searchResult.selector) {
       let generator = new SelectorsGenerator();
@@ -81,7 +82,10 @@ export default class GetElementCommand {
     }
     loggerService.log('get-autoheal', searchResult.elementSimplePath || searchResult.selector, searchResult.element, this.options);
     reportService.pushData(this.mainSelector, this.elementId, searchResult);
-    return searchResult.element as Element;
+    let result = new GetElementCommandResult(searchResult.element, searchResult.selector);
+    result.isFoundByAutoheal = true;
+    result.elementSimplePath = searchResult.elementSimplePath;
+    return result;
   }
 
   private elNotFoundException(m?: string | undefined){

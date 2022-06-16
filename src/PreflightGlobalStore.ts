@@ -3,9 +3,10 @@ export default class PreflightGlobalStore {
   constructor() {
     throw new Error('cannot instantiate using a static class');
   }
-  public static apiUrl:string = 'https://apidev.preflightdev.com/v1/';
-  public static authServerUrl:string = 'https://authdev.preflightdev.com';
-  public static emailDomain:string = 'test-dev.preflight.com';
+  private static isDevMode = false;
+  public static apiUrl:string = PreflightGlobalStore.isDevMode ? 'https://apidev.preflightdev.com/v1/' : 'https://api.preflight.com/v1/';
+  public static authServerUrl:string = PreflightGlobalStore.isDevMode ? 'https://authdev.preflightdev.com' : 'https://auth.preflight.com';
+  public static emailDomain:string = PreflightGlobalStore.isDevMode ? 'test-dev.preflight.com' : 'test.preflight.com';
   public static adminEmailDomain:string = 'testadmin.preflight.com';
   public static ApiKey:string|null;
   public static fixedFiles: string[] = [];
@@ -18,6 +19,7 @@ export default class PreflightGlobalStore {
   }
 
   public static initialize() {
+    console.log(PreflightGlobalStore.apiUrl);
     PreflightGlobalStore.state = {
       variables: {},
       currentTestId: null,

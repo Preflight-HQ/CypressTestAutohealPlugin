@@ -5,11 +5,13 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "NODE_ENV=production tsc",
-    "build:dev": "webpack --mode development",
+    "build:dev": "NODE_ENV=development tsc",
     "test": "cypress run",
     "cy:open": "cypress open",
     "cy:open:dev": "copy .env.development ./dist/.env & cypress open",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "build:seleniumExport": "webpack --mode production",
+    "build:seleniumExport:dev": "webpack --mode development"
   },
   "keywords": [],
   "author": "",

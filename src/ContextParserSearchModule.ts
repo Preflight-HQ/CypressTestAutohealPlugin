@@ -77,6 +77,7 @@ export default class ContextParserSearchModule {
       result.parserVersion = parserStepData.parserVersion
       return result;
     } catch(e){
+      console.debug(e);
       return null;
     }
   }
