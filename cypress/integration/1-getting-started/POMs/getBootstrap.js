@@ -58,7 +58,7 @@ export default class CheckoutExampleBootstrapPOM {
    purpose: email | placeholder: you@example.com | id: email | inputType: email | tag: input | class: form-control
    */
   typeEmailOptional(EmailOptional) {
-    return cy.get('#email', 'pom82ae16cd-1f5a-4588-9fe7-73ffb8e4442c')
+    return cy.get('#eml', 'pom82ae16cd-1f5a-4588-9fe7-73ffb8e4442c')
       .clear()
       .type(EmailOptional);
   }

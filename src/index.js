@@ -64,7 +64,7 @@ Cypress.Commands.overwrite('get', (originalFn, selector, optionsOrElementId, pos
   return new Cypress.Promise(async (resolve, reject) => {
     try {
       let result = await testAutohealService.findElement(doc, selector, elementId, getOptions, testTitle, originalFn)
-      resolve(result);
+      resolve(result.element);
     } catch (e) {
       reject(e.message);
     }

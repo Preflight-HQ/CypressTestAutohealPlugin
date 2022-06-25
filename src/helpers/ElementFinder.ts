@@ -38,26 +38,38 @@ export default class ElementFinder {
       return currentTestData;
     }
     try {
-      let autohealResponse = await autohealApiService.getData(testId, testTitle);
-      if(!autohealResponse){
+      let testAutohealData = await autohealApiService.getTestAutohealData(testId, testTitle);
+      if(!testAutohealData){
         return null;
       }
-      let testAutohealData = JSON.parse(autohealResponse.dataJson);
       return testAutohealData;
     } catch (e) {
-      this.lastError = 'Autoheal request failed: ' + e.responseText
+      this.lastError = 'Test autoheal request failed: ' + e.responseText
       return null;
     }
   }
 
-  public async findTestElementByAutohealData(testId: string, actionId: string, testTitle: string) {
-    if(!testId || !actionId){
-      this.lastError = 'Autoheal was not initialized correctly for action id: ' + actionId;
+  public async getPomAutohealData(testId: string, testTitle:string): Promise<any | null> {
+    try {
+      let testAutohealData = await autohealApiService.getPomAutohealData(testId, testTitle);
+      if(!testAutohealData){
+        return null;
+      }
+      return testAutohealData;
+    } catch (e) {
+      this.lastError = 'POM autoheal request failed: ' + e.responseText
+      return null;
+    }
+  }
+
+  public async findTestElementByAutohealData(testId: string, actionContextId: string, testTitle: string) {
+    if(!testId || !actionContextId){
+      this.lastError = 'Autoheal was not initialized correctly for action id: ' + actionContextId;
       return null;
     }
     let testAutohealData = await this.getTestAutohealData(testId, testTitle);
     PreflightGlobalStore.state.currentTestData = testAutohealData;
-    let actionAutohealData = testAutohealData?.actions.find(a => a.guid == actionId)?.data;
+    let actionAutohealData = testAutohealData?.actions.find(a => a.contextId == actionContextId)?.data;
     if(!testAutohealData){
       return null;
     }
@@ -78,11 +90,15 @@ export default class ElementFinder {
 
   public async findPomElementByAutohealData(elementId: string, testTitle: string) {
     elementId = ElementFinder.getGuidCypressPomElGuid(elementId);
-    let autohealDataResponse = await this.getTestAutohealData(elementId, testTitle);
-    if(!autohealDataResponse){
+    let pomAutohealDataResponse = await this.getPomAutohealData(elementId, testTitle);
+    if(!pomAutohealDataResponse?.dataJson){
       return null;
     }
-    let cyPomAutohealData = new CyPomAutohealData(autohealDataResponse.selectors, autohealDataResponse.parsedData);
+    let pomAutohealData = JSON.parse(pomAutohealDataResponse.dataJson);
+    if(!pomAutohealData){
+      return null;
+    }
+    let cyPomAutohealData = new CyPomAutohealData(pomAutohealData.selectors, pomAutohealData.parsedData);
     let parserData = cyPomAutohealData.parserData;
     let elFinderSearchData = new ElementFinderSearchData(cyPomAutohealData.selectors);
     let elementSelectorsSearch = new ElementSelectorsSearchModule(this.elSelector);
