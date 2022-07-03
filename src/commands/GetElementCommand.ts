@@ -56,7 +56,7 @@ export default class GetElementCommand {
   public async process(): Promise<GetElementCommandResult> {
     // if we can resolve element without autoheal
     if(await this.isElMainSelOnPage()){
-      let element = this.elSelector.getFirstElement(this.mainSelector);
+      let element = this.elSelector.getFirstElement(this.mainSelector, this.parentIframeSelector);
       loggerService.log(this.isMainSelectorXPath ? 'get-xPath' : 'get', this.getLogSelector(this.mainSelector), element, this.options);
       return new GetElementCommandResult(element, this.mainSelector);
     }

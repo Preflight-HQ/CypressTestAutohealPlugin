@@ -2,6 +2,36 @@ import TestPage from './POMs/getBootstrap';
 import LoginYourwebappPOM from './POMs/yourWebApp_login';
 
 /* check the documentation if getting errors: https://bit.ly/3LKWTXR */
+describe('test', () => {
+  it('Forgot Password | YourWebApp', () => {
+    cy.viewport(1440, 900);
+    cy.initializeAutoheal('WKqmbGHRl9wD');
+    cy.visit('https://yourweb.app/#/login');
+    cy.get('.max-w>a', 2).click();
+    cy.get('#pf-lesson-signup-0', 3).type('{{name.firstName}}');
+    cy.get('#pf-lesson-signup-1', 4).type('{{name.lastName}}');
+    cy.get('form>.flex>div:nth-child(2)', 5).click();
+    cy.get('#pf-lesson-signup-2', 6).type('{{generate.email}}');
+    cy.get('#pf-lesson-signup-3', 7).type('Test123');
+    cy.get('.text-white', 8).click();
+    cy.openEmail('Verify your email');
+    cy.get('a', {iframe: '.data-box-content>iframe'}, 10).click();
+    cy.closeEmail()
+    cy.get('#pf-lesson-login-0', 12).type('{{generate.email}}');
+    cy.get('#pf-lesson-login-1', 13).type('test123');
+    cy.get('#pf-lesson-login-2', 14).click();
+    cy.get('form>.text-sm', 15).should('include.text', 'Invalid email or password');
+    cy.get('#pf-lesson-login-1', 16).type('Test123');
+    cy.get('#pf-lesson-login-1', 17).type('{enter}');
+    cy.get('.flex>.text-sm>a', 18).click();
+    cy.get('.w-full', 19).type('{{generate.email}}');
+    cy.get('.text-white', 20).click();
+    cy.get('.text-xl', 21).should('include.text', 'We’ve sent you an email link to reset your password');
+    cy.autoheal();
+  })
+});
+
+/* check the documentation if getting errors: https://bit.ly/3LKWTXR */
 /* check the documentation if getting errors: https://bit.ly/3LKWTXR */
 // describe('test', () => {
 //   it('Login | YourWebApp', () => {
@@ -14,29 +44,44 @@ import LoginYourwebappPOM from './POMs/yourWebApp_login';
 //   })
 // });
 
+/* check the documentation if getting errors: https://bit.ly/3LKWTXR */
 // describe('test', () => {
 //   it('Login | YourWebApp', () => {
 //     cy.viewport(1440, 900);
-//     cy.initializeAutoheal('puaecWLFgFw3');
+//     cy.initializeAutoheal('IaSBCkCQFSfV');
 //     cy.visit('https://yourweb.app/#/login');
-//     cy.get('#pf-lesson-login', 2).type('tetet');
-//     cy.get('#pf-lesson-login-0', 2).click();
-//     cy.get('#pf-lesson-login-1', 3).click();
-//     cy.get('#pf-lesson-login-2', 4).should('include.text', 'Sign in');
+//     cy.get('#pf-lesson-login-0', 2).type('test@test.com');
+//     cy.get('#pf-lesson-login-1', 3).type('test');
+//     cy.get('#pf-lesson-login-2', 4).click();
 //     cy.autoheal();
 //   })
 // });
 
-describe('POM test', () => {
-  it('File upload and sharing. Large file transfers. Free online cloud storage.', () => {
-    cy.viewport(1440, 900);
-    let pom = new LoginYourwebappPOM();
-    pom.visit();
-    pom.typeEmailAddress('test@email.com');
-    cy.autoheal();
-  })
-})
-
+// describe('POM test', () => {
+//   it('File upload and sharing. Large file transfers. Free online cloud storage.', () => {
+//     cy.viewport(1440, 900);
+//     let pom = new LoginYourwebappPOM();
+//     pom.visit();
+//     pom.typeEmailAddress('test@email.com');
+//     cy.autoheal();
+//   })
+// })
+//
+//
+// describe('test', () => {
+//   it('', () => {
+//     cy.viewport(1440, 900);
+//     cy.initializeAutoheal('CddNFvQr9KTh');
+//     cy.get('(//ul/li[4]/button/span)[1]', undefined).click();
+//     cy.get('(//span/span)[2]', undefined).click();
+//     cy.get('//span[normalize-space(.)="Filter"]', undefined).click();
+//     cy.get('(//span/span)[3]', undefined).click();
+//     cy.get('div>[type="text"]', undefined).type('back');
+//     cy.get('(//div/*/li[1]/h5)[1]', undefined).click();
+//     cy.get('//span[normalize-space(.)="Backend Engineer"]', undefined).should('include.text', 'Backend Engineer');
+//     cy.autoheal()
+//   })
+// })
 
 
 

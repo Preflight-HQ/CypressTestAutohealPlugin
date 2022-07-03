@@ -9,7 +9,7 @@ export default class LoginYourwebappPOM {
    href: ? | tag: a | purpose: navigation | class: font-medium
    */
   clickSignup() {
-    return cy.get('.max-w>a', 'pomMP9DSKcon5EZ')
+    return cy.get('.max-w>a', 'pom8chlhWeu1zXN')
       .click();
   }
 
@@ -18,7 +18,7 @@ export default class LoginYourwebappPOM {
    purpose: email | id: pf-lesson-login-0 | inputType: email | tag: input | class: shadow-sm, appearance-none, block, w-full, border, rounded-md
    */
   typeEmailAddress(emailAddress) {
-    return cy.get('[type="eml"]', 'pomruUbfBySJagN')
+    return cy.get('[type="em"]', 'pomMm1kj6Q2n7gC')
       .clear()
       .type(emailAddress);
   }
@@ -28,7 +28,7 @@ export default class LoginYourwebappPOM {
    purpose: password | id: pf-lesson-login-1 | inputType: password | tag: input | class: shadow-sm, appearance-none, block, w-full, border, rounded-md
    */
   typePassword(password) {
-    return cy.get('[type="password"]', 'pomEkEgjPifxuPZ')
+    return cy.get('[type="password"]', 'pomgq5BHjxJBMY8')
       .clear()
       .type(password);
   }
@@ -38,7 +38,7 @@ export default class LoginYourwebappPOM {
    id: remember_me | tag: input | class: rounded
    */
   clickCheckboxOption() {
-    return cy.get('.rounded', 'pomQ99kh5y7ve8l')
+    return cy.get('.rounded', 'pomYkIbeXWUDFDQ')
       .click();
   }
 
@@ -47,7 +47,7 @@ export default class LoginYourwebappPOM {
    href: ? | tag: a | purpose: navigation | class: font-medium
    */
   clickForgotYourPassword() {
-    return cy.get('//*[contains(text(),"Forgot your password?")]', 'pom9IorOJeKbOW1')
+    return cy.get('//*[contains(text(),"Forgot your password?")]', 'pomYSh75iNeTBYq')
       .click();
   }
 
@@ -56,7 +56,7 @@ export default class LoginYourwebappPOM {
    purpose: submit | id: pf-lesson-login-2 | tag: button | class: text-white, flex, justify-center, border, border-transparent, rounded-md, shadow-sm, text-sm, font-medium
    */
   clickSignIn() {
-    return cy.get('.text-white', 'pomBSMom1fBxf3O')
+    return cy.get('.text-white', 'pomhMSRZVBs9McN')
       .click();
   }
 

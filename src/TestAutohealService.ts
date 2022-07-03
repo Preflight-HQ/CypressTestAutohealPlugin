@@ -15,7 +15,7 @@ class TestAutohealService {
   }
 
   async findElement(doc: Document, selector: string, elementId: string, getOptions: any, testTitle: string, getElFunction: (string, any) => HTMLElement): Promise<GetElementCommandResult>{
-    await sleepAsync(100);
+    await sleepAsync(500);
     let getCommand = new GetElementCommand(doc, selector, getOptions, elementId, testTitle);
     if(await getCommand.doesElementExistOnPage()) {
       let el = getElFunction(selector, getOptions);

@@ -78,6 +78,7 @@ export default class OpenEmailCommand {
 
     let preflightMain = this.doc.createElement('preflight-main');
     let preflightEmail = this.doc.createElement('preflight-email');
+    preflightEmail.classList.add('data-box-content');
     let emailIframe = this.doc.createElement('iframe');
     emailIframe.id = 'pf-email-iframe';
     srcDoc(emailIframe, emailContentHtml);
