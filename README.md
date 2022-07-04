@@ -16,12 +16,12 @@ require('@preflight-hq/preflight-cypress-plugin')
  - Alternatively you can go to [Account Settings / API](https://app.preflight.com/account/api) to generate a new one. 
  
 ## Set API key in your test environment
-- You can set key in code like  `Cypress.PreflightApiKey = [YOUR_API_KEY];`
-- Or set Cypress env in your `cypress.json` file. 
+- You can set key in code like  `Cypress.PreflightApiKey = '[YOUR_API_KEY]';`
+- Or set Cypress env in your `cypress.json.ts` file. 
 
 ```
-"env": {
-  "PREFLIGHT_API_KEY": "[YOUR_API_KEY]"
+env: {
+  PREFLIGHT_API_KEY: '[YOUR_API_KEY]'
  }
 ```
 
