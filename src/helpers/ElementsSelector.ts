@@ -11,24 +11,32 @@ export default class ElementsSelector {
 
   public getElementsByXPath(xpath: string) : Element[]
   {
-    let parent = this.parentIframeSelector ? this.doc.querySelector(this.parentIframeSelector) : this.doc;
-    let results = [];
-    let query = this.doc.evaluate(xpath, parent,
-      null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-    for (let i = 0, length = query.snapshotLength; i < length; ++i) {
-      results.push(query.snapshotItem(i));
+    try {
+      let parent = this.parentIframeSelector ? this.doc.querySelector(this.parentIframeSelector) : this.doc;
+      let results = [];
+      let query = this.doc.evaluate(xpath, parent,
+        null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+      for (let i = 0, length = query.snapshotLength; i < length; ++i) {
+        results.push(query.snapshotItem(i));
+      }
+      return results;
+    } catch (e) {
+      return [];
     }
-    return results;
   }
 
   public getElements(selector: string, parentSelector: string|null = this.parentIframeSelector): Element[]{
-    let parent = this.doc;
-    if (parentSelector){
-      // @ts-ignore
-      let iframeDoc = this.getFirstElement(parentSelector, null)?.contentDocument;
-      parent = iframeDoc || this.doc;
+    try {
+      let parent = this.doc;
+      if (parentSelector) {
+        // @ts-ignore
+        let iframeDoc = this.getFirstElement(parentSelector, null)?.contentDocument;
+        parent = iframeDoc || this.doc;
+      }
+      return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(parent.querySelectorAll(selector));
+    } catch (e) {
+      return [];
     }
-    return this.isXpathSelector(selector) ? this.getElementsByXPath(selector) : Array.from(parent.querySelectorAll(selector));
   }
 
   public getFirstElement(selector: string, parentSelector: string|null = this.parentIframeSelector): Element{
